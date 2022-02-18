@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_flight"
+            android:icon="@drawable/ic_baseline_flight_24"
+            android:title="Calculate Flight" />
+        <item
+            android:id="@+id/nav_food"
+            android:icon="@drawable/ic_baseline_fastfood_24"
+            android:title="Calculate Food Consumption" />
+        <item
+            android:id="@+id/nav_utilities"
+            android:icon="@drawable/ic_baseline_fireplace_24"
+            android:title="Calculate Utilities" />
+        <item
+            android:id="@+id/nav_pledge"
+            android:icon="@drawable/ic_baseline_pledge_24"
+            android:title="Pledge" />
+        <item
+            android:id="@+id/nav_groups"
+            android:icon="@drawable/ic_baseline_group_24"
+            android:title="Groups" />
+        <item
+            android:id="@+id/nav_account"
+            android:icon="@drawable/ic_baseline_person_outline_24"
+            android:title="Account" />
+
+    </group>
+</menu>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/green_background"
+    android:id="@+id/flight_food">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/foodIcon"
+            android:layout_width="203dp"
+            android:layout_height="168dp"
+            android:layout_marginTop="24dp"
+            android:src="@drawable/ic_baseline_fastfood_24"
+            android:layout_centerInParent="true"/>
+
+        <TextView
+            android:id="@+id/editTextDepart"
+            android:layout_width="300dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/transparent"
+            android:ems="10"
+            android:hint="How many times a week do you consume meat?"
+            android:inputType="text"
+            android:minHeight="48dp"
+            android:textAlignment="center"
+            android:textColorHint="#F6F6F6" />
+
+        <Spinner
+            android:id="@+id/food_spinner"
+            android:layout_width="300dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/transparent"
+            android:ems="10"
+            android:minHeight="48dp"
+            android:textAlignment="center"
+            android:textColorHint="#F6F6F6" />
+
+        <Button
+            android:id="@+id/calculateFoodButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="300dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="8dp"
+            android:text="Calculate" />
+
+    </LinearLayout>
+
+</RelativeLayout>
