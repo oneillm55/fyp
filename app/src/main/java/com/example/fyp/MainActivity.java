@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         if(firebaseUser.isEmailVerified()){
             //login
             //finish();
-            startActivity(new Intent(MainActivity.this, FlightActivity.class));
+            startActivity(new Intent(MainActivity.this, DrawerActivity.class));
         }else{
             Toast.makeText(getApplicationContext(), "Please verify your email first", Toast.LENGTH_SHORT).show();
 
