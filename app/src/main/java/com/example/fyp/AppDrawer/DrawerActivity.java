@@ -14,6 +14,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.fyp.FlightFolder.FlightFragment;
 import com.example.fyp.FoodFolder.FoodFragment;
+import com.example.fyp.HomeFragment;
 import com.example.fyp.R;
 import com.example.fyp.UserFolder.User;
 import com.example.fyp.UserFolder.UserFragment;
@@ -54,13 +55,13 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         drawer.addDrawerListener(toggle);
         toggle.syncState();//handles the rotating icon
 
-        //set default fragment to the flight fragment
+        //set default fragment to the home fragment
         // the if makes sure that the fragment is not reset everytime the phone is rotated
 
         if(savedInstanceState == null) {//only if the state hasnt been set in the current session
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new FlightFragment()).commit();
-            navigationView.setCheckedItem(R.id.nav_flight);
+                    new HomeFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_home);
         }
 
 
@@ -98,32 +99,31 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()){
-            case R.id.nav_flight:
+            case R.id.nav_home:
                 //pass the frame layout inside the linear layout of the nav drawer the fragment selected
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new HomeFragment()).commit();
+                break;
+            case R.id.nav_flight:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new FlightFragment()).commit();
                 break;
             case R.id.nav_food:
-                //pass the frame layout inside the linear layout of the nav drawer the fragment selected
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new FoodFragment()).commit();
                 break;
             case R.id.nav_utilities:
-                //pass the frame layout inside the linear layout of the nav drawer the fragment selected
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new UtilitiesFragment()).commit();
                 break;
             case R.id.nav_account:
-                //pass the frame layout inside the linear layout of the nav drawer the fragment selected
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new UserFragment()).commit();
                 break;
             case R.id.nav_groups:
-                //pass the frame layout inside the linear layout of the nav drawer the fragment selected
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new FlightFragment()).commit();
             case R.id.nav_pledge:
-                //pass the frame layout inside the linear layout of the nav drawer the fragment selected
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new FlightFragment()).commit();
                 break;
