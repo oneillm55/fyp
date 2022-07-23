@@ -1,4 +1,4 @@
-package com.example.fyp;
+package com.example.fyp.UserFolder;
 
 public class User {
 
@@ -10,6 +10,10 @@ public class User {
         this.usernname = usernname;
         this.email = email;
         this.password = password;
+    }
+
+
+    public User() {
     }
 
 

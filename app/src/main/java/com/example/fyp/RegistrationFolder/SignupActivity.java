@@ -1,4 +1,4 @@
-package com.example.fyp;
+package com.example.fyp.RegistrationFolder;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,17 +11,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.fyp.MainActivity;
+import com.example.fyp.R;
+import com.example.fyp.UserFolder.User;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -45,7 +44,7 @@ public class SignupActivity extends AppCompatActivity {
         registerButton =findViewById(R.id.buttonRegister);
         goBackButton=findViewById(R.id.buttonReturnLogin);
 
-        getSupportActionBar().setTitle("");
+        //getSupportActionBar().setTitle("");
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -55,7 +54,7 @@ public class SignupActivity extends AppCompatActivity {
         goBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(SignupActivity.this,MainActivity.class));
+                startActivity(new Intent(SignupActivity.this, MainActivity.class));
             }
         });
 

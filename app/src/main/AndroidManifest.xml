@@ -12,17 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FYP">
         <activity
-            android:name=".ViewFlightsActivity"
+            android:name=".FlightFolder.ViewFlightsActivity"
             android:exported="true" />
         <activity
-            android:name=".DrawerActivity"
+            android:name=".AppDrawer.DrawerActivity"
             android:exported="true" />
         <activity
-            android:name=".FlightDisplayActivity"
+            android:name=".FlightFolder.FlightDisplayActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".FlightActivity"
+            android:name=".FlightFolder.FlightActivity"
             android:exported="true" />
         <activity
             android:name=".MainActivity"
@@ -35,10 +35,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SignupActivity"
+            android:name=".RegistrationFolder.SignupActivity"
             android:exported="true" />
         <activity
-            android:name=".UserDetailsActivity"
+            android:name=".UserFolder.UserDetailsActivity"
             android:exported="true" />
     </application>
 

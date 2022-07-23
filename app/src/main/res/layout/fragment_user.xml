@@ -12,60 +12,38 @@
         android:gravity="center">
 
         <ImageView
-            android:id="@+id/flightIcon"
+            android:id="@+id/userIcon"
             android:layout_width="203dp"
             android:layout_height="168dp"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="50dp"
             android:src="@drawable/ic_baseline_flight_24" />
 
-        <EditText
-            android:id="@+id/editTextDepart"
+        <TextView
+            android:id="@+id/textViewEmail"
             android:layout_width="300dp"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
             android:background="@android:color/transparent"
             android:ems="10"
-            android:hint="Depart From.."
-            android:inputType="text"
             android:minHeight="48dp"
             android:textAlignment="center"
             android:textColorHint="#F6F6F6" />
 
-        <EditText
-            android:id="@+id/editTextArrive"
+        <TextView
+            android:id="@+id/textViewUsername"
             android:layout_width="300dp"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
             android:background="@android:color/transparent"
             android:ems="10"
-            android:hint="Arrive In.."
-            android:inputType="text"
             android:minHeight="48dp"
             android:textAlignment="center"
             android:textColorHint="#F6F6F6" />
 
-        <Button
-            android:id="@+id/calculateFlightButton"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="300dp"
-            android:layout_height="62dp"
-            android:layout_marginTop="8dp"
-            android:text="Calculate" />
-        <Button
-            android:id="@+id/viewFlightButton"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="300dp"
-            android:layout_height="62dp"
-            android:layout_marginTop="8dp"
-            android:text="View Flights" />
-
-        <FrameLayout
-            android:id="@+id/flight_fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
 
     </LinearLayout>
+
 
 
 </RelativeLayout>

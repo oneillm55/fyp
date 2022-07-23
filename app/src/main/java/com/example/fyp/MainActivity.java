@@ -11,6 +11,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.fyp.AppDrawer.DrawerActivity;
+import com.example.fyp.FlightFolder.FlightActivity;
+import com.example.fyp.RegistrationFolder.SignupActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;

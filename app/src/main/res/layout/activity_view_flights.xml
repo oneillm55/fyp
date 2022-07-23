@@ -11,7 +11,7 @@
         android:gravity="center">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/flights_recycler_view"
+            android:id="@+id/activity_flights_recycler_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="1dp"

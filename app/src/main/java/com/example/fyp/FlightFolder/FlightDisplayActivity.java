@@ -1,4 +1,4 @@
-package com.example.fyp;
+package com.example.fyp.FlightFolder;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.example.fyp.R;
 
 public class FlightDisplayActivity extends AppCompatActivity {
 

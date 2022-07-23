@@ -1,4 +1,4 @@
-package com.example.fyp;
+package com.example.fyp.FlightFolder;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,8 +12,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.fyp.MainActivity;
+import com.example.fyp.R;
+import com.example.fyp.UserFolder.User;
+import com.example.fyp.UserFolder.UserDetailsActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 
 
 public class FlightActivity extends AppCompatActivity {
@@ -21,7 +26,9 @@ public class FlightActivity extends AppCompatActivity {
     private EditText depart, arrival;
     private Button calculateFlightButton;
     private FirebaseAuth firebaseAuth;
-    FirebaseUser firebaseUser;
+    private DatabaseReference mDatabase;
+    private String userID;
+    private FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +41,7 @@ public class FlightActivity extends AppCompatActivity {
         arrival = findViewById(R.id.editTextArrive);
         calculateFlightButton = findViewById(R.id.calculateFlightButton);
         firebaseAuth = FirebaseAuth.getInstance();
+        userID = firebaseUser.getUid();
 
         calculateFlightButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +70,15 @@ public class FlightActivity extends AppCompatActivity {
 //                    } catch (IOException e) {
 //                        e.printStackTrace();
 //                    }
+
+
+                    //add flight to database
+                    Flight flight = new Flight(barrival,bdepart,"10",userID);
+
+                    mDatabase.child("trips").child(userID).setValue(flight);
+
+
+                    //launch fragment instead of activity
                     Intent i = new Intent(FlightActivity.this, FlightDisplayActivity.class);
                     i.putExtra("depart", bdepart);
                     i.putExtra("arrive", barrival);
