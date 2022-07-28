@@ -37,9 +37,6 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
 
-
-
-       // Toolbar toolbar = findViewById(R.id.toolbar);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

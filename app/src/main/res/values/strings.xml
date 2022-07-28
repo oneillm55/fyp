@@ -4,12 +4,31 @@
     <string name="navigation_drawer_open">Open Navigation drawer</string>
     <string name="navigation_drawer_close">Close Navigation drawer</string>
 
-    <string-array name="food_spinner_options">
-        <item>Every day</item>
-        <item>2-3 times a week</item>
-        <item>more than once a week</item>
-        <item>Once a week</item>
+    <string-array name="meat_spinner_options">
+        <item>Most meals</item>
+        <item>Once a day</item>
+        <item>Occasionally</item>
         <item>Never</item>
+    </string-array>
+    <string-array name="dairy_spinner_options">
+        <item>Every day</item>
+        <item>Occasionally</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="compost_spinner_options">
+        <item>No</item>
+        <item>Yes</item>
+    </string-array>
+    <string-array name="organic_spinner_options">
+        <item>None</item>
+        <item>Some</item>
+        <item>Most</item>
+    </string-array>
+    <string-array name="shopping_spinner_options">
+        <item>All supermarkets, pay no attention to country of origin</item>
+        <item>Mostly supermarkets, try to buy Irish</item>
+        <item>Mostly Local, some supermarkets</item>
+        <item>Only local produce</item>
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
