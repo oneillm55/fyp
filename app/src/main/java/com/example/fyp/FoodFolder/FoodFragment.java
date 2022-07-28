@@ -19,6 +19,9 @@ import androidx.fragment.app.Fragment;
 import com.example.fyp.AppDrawer.DrawerActivity;
 import com.example.fyp.R;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.DecimalFormat;
 
@@ -26,6 +29,10 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
     String meatString,dairyString, compostString, organicString,shoppingString;
     TextView displayTextView;
+    double foodValue;
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference mDatabase;
+    private String userID;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
 
@@ -40,6 +47,15 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        //link firebase
+        firebaseAuth = FirebaseAuth.getInstance();
+
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+
+
+
         Spinner meatSpinner = view.findViewById(R.id.meat_spinner);
         ArrayAdapter<CharSequence> meatAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.meat_spinner_options, android.R.layout.simple_spinner_item);
         meatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
@@ -109,8 +125,9 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
     @Override
     public void onClick(View view) {
-        //get values from spinners and use them to calculate amount of co2
         updateDisplay();
+        mDatabase.child("footprint").child(firebaseAuth.getUid()).child("food").setValue(df.format(getFoodCO2()));
+        // to do only update this data when user wants to save input ie allow them to check the value based on their input into the spinners before they save it to firebase
     }
 
 
@@ -133,7 +150,6 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
         }
         switch(dairyString) {
             case "Never":
-                value = value = 0.1;
                 break;
             case "Occasionally":
                 value = value + .04;
@@ -145,7 +161,6 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
         switch(compostString) {
             case "Yes":
-                value = value = 0.1;
                 break;
             case "No":
                 value = value + .03;
@@ -179,6 +194,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
                 break;
         }
 
+        //foodValue=value;
         return value;
     }
 
