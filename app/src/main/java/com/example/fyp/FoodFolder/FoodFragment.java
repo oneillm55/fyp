@@ -126,7 +126,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
     @Override
     public void onClick(View view) {
         updateDisplay();
-        mDatabase.child("footprint").child(firebaseAuth.getUid()).child("food").setValue(df.format(getFoodCO2()));
+        mDatabase.child("footprint").child(firebaseAuth.getUid()).child("food").setValue(getFoodCO2());
         // to do only update this data when user wants to save input ie allow them to check the value based on their input into the spinners before they save it to firebase
     }
 
