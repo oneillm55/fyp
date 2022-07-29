@@ -30,11 +30,17 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 
+
+
 public class HomeFragment extends Fragment {
     private PieChart pieChart;
     FirebaseAuth firebaseAuth;
     DatabaseReference mDatabase;
-    double foodCO2,flightCO2,clothingCO2,totalCO2;
+    double foodCO2,flightCO2,clothingCO2,totalCO2=13.3;
+
+    public HomeFragment() {
+        // Required empty public constructor
+    }
 
 
     @Override
@@ -61,7 +67,6 @@ public class HomeFragment extends Fragment {
 
             }
         });
-        // Toast.makeText(getActivity(),"flStr2"+flightCO2, Toast.LENGTH_LONG).show();
         totalCO2=foodCO2+flightCO2+clothingCO2;
         return inflater.inflate(R.layout.fragment_home, container, false);
 
@@ -74,7 +79,6 @@ public class HomeFragment extends Fragment {
         pieChart = view.findViewById(R.id.pieChart);
         setUpPieChart();
         loadPieChartData();
-        //Toast.makeText(getActivity(),"id "+firebaseAuth.getUid()+"fl "+flightCO2+" c "+clothingCO2+" fo "+foodCO2, Toast.LENGTH_SHORT).show();
     }
     public void setUpPieChart(){
         pieChart.setDrawHoleEnabled(true);
