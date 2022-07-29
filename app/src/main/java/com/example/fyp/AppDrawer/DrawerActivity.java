@@ -63,7 +63,6 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
 
         //get the current user email and username and display it in the nav header
-
         firebaseAuth = FirebaseAuth.getInstance();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users").child(firebaseAuth.getUid());
         databaseReference.addValueEventListener(new ValueEventListener() {
