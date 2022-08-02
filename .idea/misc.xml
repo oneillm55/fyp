@@ -4,11 +4,13 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.30416666666666664" />
+        <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/drawable/footprint_solid_background.xml" value="0.321875" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/drawable/gradient.xml" value="0.22685185185185186" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/drawable/green_background.xml" value="0.22685185185185186" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/drawable/ic_baseline_arrow_right_alt_24.xml" value="0.30416666666666664" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/drawable/ic_launcher_background.xml" value="0.30416666666666664" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/drawable/view_flights_activity.xml" value="0.30416666666666664" />
+        <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/drawable/whitefootprint.xml" value="0.3828125" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/activity_drawer.xml" value="0.25" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/activity_flight_display.xml" value="0.2828125" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/activity_home.xml" value="0.2520833333333333" />
@@ -21,7 +23,7 @@
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/fragment_flight.xml" value="0.28958333333333336" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/fragment_food.xml" value="0.33" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/fragment_group.xml" value="0.28958333333333336" />
-        <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/fragment_home.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/fragment_home.xml" value="0.1" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/fragment_pledge.xml" value="0.28958333333333336" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/fragment_user.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/fragment_utilities.xml" value="0.1" />
@@ -29,6 +31,8 @@
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/layout/nav_header.xml" value="0.33" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/menu/drawer_menu.xml" value="0.22" />
         <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/menu/menu.xml" value="0.2520833333333333" />
+        <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/mipmap-anydpi-v26/footprint_solid.xml" value="0.22864583333333333" />
+        <entry key="..\:/Users/Mark/AndroidStudioProjects/FYP/app/src/main/res/mipmap-anydpi-v26/footprint_solid_round.xml" value="0.22864583333333333" />
         <entry key="..\:/Users/Mark/AppData/Local/Android/Sdk/platforms/android-31/data/res/layout/simple_spinner_item.xml" value="0.2125" />
       </map>
     </option>
