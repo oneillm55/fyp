@@ -53,9 +53,6 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-
-
-
         Spinner meatSpinner = view.findViewById(R.id.meat_spinner);
         ArrayAdapter<CharSequence> meatAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.meat_spinner_options, android.R.layout.simple_spinner_item);
         meatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
@@ -69,7 +66,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
         dairySpinner.setOnItemSelectedListener(this);
 
         Spinner compostSpinner = view.findViewById(R.id.compost_spinner);
-        ArrayAdapter<CharSequence> compostAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.compost_spinner_options, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> compostAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.yes_no_spinner_options, android.R.layout.simple_spinner_item);
         compostAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         compostSpinner.setAdapter(compostAdapter);
         compostSpinner.setOnItemSelectedListener(this);

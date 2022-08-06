@@ -18,17 +18,17 @@ public class ViewFlightsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_flights);
     }
-    public class LocationViewHolder extends RecyclerView.ViewHolder{
-
-        TextView arrive,depart,score;
-        LinearLayout flight;
-
-        public LocationViewHolder(@NonNull View itemView) {
-            super(itemView);
-            arrive=itemView.findViewById(R.id.arrive_name);
-            depart=itemView.findViewById(R.id.depart_name);
-            score=itemView.findViewById(R.id.flight_score);
-            flight=itemView.findViewById(R.id.flight_linear_layout);
-        }
-    }
+//    public class LocationViewHolder extends RecyclerView.ViewHolder{
+//
+//        TextView arrive,depart,score;
+//        LinearLayout flight;
+//
+//        public LocationViewHolder(@NonNull View itemView) {
+//            super(itemView);
+//            arrive=itemView.findViewById(R.id.arrive_name);
+//            depart=itemView.findViewById(R.id.depart_name);
+//            score=itemView.findViewById(R.id.flight_score);
+//            flight=itemView.findViewById(R.id.flight_linear_layout);
+//        }
+//    }
 }

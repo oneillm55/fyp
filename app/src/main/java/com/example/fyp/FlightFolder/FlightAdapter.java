@@ -34,7 +34,8 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
         Flight flight = flightList.get(position);
         holder.arrival.setText(flight.getArrive());
         holder.depart.setText(flight.getDepart());
-        holder.score.setText(flight.getScore());
+        holder.footprint.setText(String.valueOf(flight.getFootprint()));
+        holder.returnFlight.setText(String.valueOf(flight.isReturnFlight()));//to do check that this is displaying correctly
 
     }
 
@@ -44,13 +45,14 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
-        private TextView depart, arrival, score;
+        private TextView depart, arrival, footprint, returnFlight;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             arrival = itemView.findViewById(R.id.depart_name);
             depart = itemView.findViewById(R.id.arrive_name);
-            score = itemView.findViewById(R.id.flight_score);
+            footprint = itemView.findViewById(R.id.flight_footprint);
+            returnFlight = itemView.findViewById(R.id.flight_return);
         }
     }
 }

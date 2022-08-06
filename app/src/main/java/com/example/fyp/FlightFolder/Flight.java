@@ -2,20 +2,21 @@ package com.example.fyp.FlightFolder;
 
 public class Flight {
     private String Arrive;
+    private String Depart;
+    private String flightClass;
+    private double footprint;
+    private boolean returnFlight;
 
-    public Flight(String arrive, String depart, String score, String uuid) {
+    public Flight(String arrive, String depart, String flightClass, double footprint, boolean returnFlight) {
         Arrive = arrive;
         Depart = depart;
-        Score = score;
-        this.uuid = uuid;
+        this.flightClass = flightClass;
+        this.footprint = footprint;
+        this.returnFlight = returnFlight;
     }
 
-    private String Depart;
-    private String Score;
-    private String uuid;
-
-//    public Flight() {
-//    }
+    public Flight() {
+    }
 
     public String getArrive() {
         return Arrive;
@@ -33,19 +34,27 @@ public class Flight {
         Depart = depart;
     }
 
-    public String getScore() {
-        return Score;
+    public String getFlightClass() {
+        return flightClass;
     }
 
-    public void setScore(String score) {
-        Score = score;
+    public void setFlightClass(String flightClass) {
+        this.flightClass = flightClass;
     }
 
-    public String getUuid() {
-        return uuid;
+    public double getFootprint() {
+        return footprint;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setFootprint(double footprint) {
+        this.footprint = footprint;
+    }
+
+    public boolean isReturnFlight() {
+        return returnFlight;
+    }
+
+    public void setReturnFlight(boolean returnFlight) {
+        this.returnFlight = returnFlight;
     }
 }

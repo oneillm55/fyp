@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fyp.UserFolder.User;
@@ -44,6 +45,7 @@ public class HomeFragment extends Fragment {
     FirebaseAuth firebaseAuth;
     DatabaseReference mDatabase;
     double foodCO2,flightCO2,clothingCO2,totalCO2=13.3;
+    TextView totalCO2TextView;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -64,9 +66,11 @@ public class HomeFragment extends Fragment {
                     //Toast.makeText(getActivity(),"flStr"+flightCO2, Toast.LENGTH_SHORT).show();
                     clothingCO2=footprint.getClothing();
                     foodCO2=footprint.getFood();
-                    //totalCO2=foodCO2+flightCO2+clothingCO2;
+                    totalCO2=foodCO2+flightCO2+clothingCO2;
                     setUpPieChart();
                     loadPieChartData();
+
+                    totalCO2TextView.setText(totalCO2+"Total CO2");
                 }
             }
             @Override
@@ -88,6 +92,8 @@ public class HomeFragment extends Fragment {
         barChart = view.findViewById(R.id.barChart);
         setUpBarChart();
         loadBarChartData();
+
+        totalCO2TextView = view.findViewById(R.id.totalCO2);
     }
 
     private void setUpBarChart() {
@@ -103,7 +109,7 @@ public class HomeFragment extends Fragment {
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         l.setOrientation(Legend.LegendOrientation.VERTICAL);
         l.setDrawInside(false);
-        l.setEnabled(true);
+        l.setEnabled(false);
     }
     private void loadBarChartData() {
         ArrayList<String> labels = new ArrayList<>();

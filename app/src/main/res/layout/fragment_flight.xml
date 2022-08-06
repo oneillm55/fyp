@@ -14,10 +14,19 @@
         <ImageView
             android:id="@+id/flightIcon"
             android:layout_width="203dp"
-            android:layout_height="168dp"
+            android:layout_height="130dp"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="50dp"
             android:src="@drawable/ic_baseline_flight_24" />
+        <TextView
+            android:id="@+id/flightFootprint"
+            android:layout_width="300dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/transparent"
+            android:minHeight="48dp"
+            android:textAlignment="center"
+            android:textColorHint="#F6F6F6" />
 
         <EditText
             android:id="@+id/editTextDepart"
@@ -44,6 +53,24 @@
             android:minHeight="48dp"
             android:textAlignment="center"
             android:textColorHint="#F6F6F6" />
+        <Spinner
+            android:id="@+id/return_spinner"
+            android:layout_width="300dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:minHeight="48dp"
+            android:textAlignment="center"
+            android:textColorHint="#F6F6F6" />
+        <Spinner
+            android:id="@+id/class_spinner"
+            android:layout_width="300dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:minHeight="48dp"
+            android:textAlignment="center"
+            android:textColorHint="#F6F6F6" />
 
         <Button
             android:id="@+id/calculateFlightButton"
@@ -53,12 +80,21 @@
             android:layout_marginTop="8dp"
             android:text="Calculate" />
         <Button
+            android:id="@+id/saveFlightButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="300dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="8dp"
+            android:text="Save Flight" />
+        <Button
             android:id="@+id/viewFlightButton"
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="300dp"
             android:layout_height="62dp"
             android:layout_marginTop="8dp"
             android:text="View Flights" />
+
+
 
         <FrameLayout
             android:id="@+id/flight_fragment_container"

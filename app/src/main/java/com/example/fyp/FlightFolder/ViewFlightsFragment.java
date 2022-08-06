@@ -63,7 +63,7 @@ public class ViewFlightsFragment extends Fragment {
 
             }
         });
-        flightList.add(new Flight("a","b","10","123"));
+      //  flightList.add(new Flight("a","b","10","123"));
         recyclerView = view.findViewById(R.id.flights_recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
@@ -72,14 +72,14 @@ public class ViewFlightsFragment extends Fragment {
     return view;
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        depart = view.findViewById(R.id.depart_name);
-        arrival = view.findViewById(R.id.arrive_name);
-        score = view.findViewById(R.id.flight_score);
-        firebaseAuth = FirebaseAuth.getInstance();
-    }
+//    @Override
+//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//        depart = view.findViewById(R.id.depart_name);
+//        arrival = view.findViewById(R.id.arrive_name);
+//        score = view.findViewById(R.id.flight_score);
+//        firebaseAuth = FirebaseAuth.getInstance();
+//    }
 
     }
 
