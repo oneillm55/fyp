@@ -5,6 +5,11 @@
     android:background="@drawable/green_background"
     android:id="@+id/flight_fragment">
 
+
+    <FrameLayout
+        android:id="@+id/flight_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -93,15 +98,7 @@
             android:layout_height="62dp"
             android:layout_marginTop="8dp"
             android:text="View Flights" />
-
-
-
-        <FrameLayout
-            android:id="@+id/flight_fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
     </LinearLayout>
-
+    </FrameLayout>
 
 </RelativeLayout>

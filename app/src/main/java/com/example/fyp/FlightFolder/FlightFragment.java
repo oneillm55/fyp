@@ -39,6 +39,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Base64;
+import java.util.UUID;
 
 public class FlightFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
@@ -90,7 +91,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
             public void onClick(View view) {
                 String bdepart = depart.getText().toString().trim();
                 String barrival = arrival.getText().toString().trim();
-                classString = getFlightClass();
+                classString = classSpinner.getSelectedItem().toString();
                 returnFlight = getReturnFlight();
 
                 if (barrival.isEmpty() || bdepart.isEmpty()) {
@@ -102,7 +103,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                         public void run() {
                             try {
 
-                                URL url = new URL("https://api.goclimate.com/v1/flight_footprint?segments[0][origin]=" + bdepart + "&segments[0][destination]=" + barrival + "&cabin_class=" + classString);
+                                URL url = new URL("https://api.goclimate.com/v1/flight_footprint?segments[0][origin]=" + bdepart + "&segments[0][destination]=" + barrival + "&cabin_class=" + getFlightClass());
                                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                                 conn.setRequestMethod("GET");
                                 conn.setRequestProperty("Accept", "application/json");
@@ -122,14 +123,19 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                                     JSONObject jsonResponse = new JSONObject(stringBuilder.toString());
                                     int jsonFootprint = jsonResponse.getInt("footprint");
                                     if (returnFlight) {
-                                        Log.e("Footprint from flight: ", String.valueOf(jsonFootprint * 2));
+                                        Log.e("Footprint return: ", String.valueOf(jsonFootprint * 2));
                                         flightFootprint.setText( String.valueOf(jsonFootprint * 2));
                                     } else {
                                         Log.e("Footprint from flight: ", String.valueOf(jsonFootprint));
                                         flightFootprint.setText( String.valueOf(jsonFootprint));
 
                                     }
+                                }else{
+                                    Log.e("URL : ", String.valueOf(url));
+                                    Log.e("Resonse code: ", String.valueOf(conn.getResponseCode()));
+                                    Log.e("Resonse message: ", String.valueOf(conn.getResponseMessage()));
                                 }
+
                                 conn.disconnect();
 
                             } catch (IOException | JSONException e) {
@@ -149,8 +155,9 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
             @Override
             public void onClick(View view) {
                 //launch view flights fragment
+                Toast.makeText(getContext(), "View Flight:", Toast.LENGTH_SHORT).show();
                 getParentFragmentManager().beginTransaction().replace(R.id.flight_fragment_container, new ViewFlightsFragment())
-                        .commit();
+                       .commit();
             }
         });
 
@@ -158,9 +165,10 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
             @Override
             public void onClick(View view) {
                 //add check to make sure a flight has been calculated
-                Flight flight = new Flight(arrival.getText().toString().trim(),depart.getText().toString().trim(),getFlightClass(),Double.valueOf(flightFootprint.getText().toString().trim()),getReturnFlight());
+                final String flightID= UUID.randomUUID().toString();//create a unique id for a flight
+                Flight flight = new Flight(arrival.getText().toString().trim(),depart.getText().toString().trim(), classSpinner.getSelectedItem().toString(),flightID,Double.valueOf(flightFootprint.getText().toString().trim()),getReturnFlight());
                 Toast.makeText(getContext(), "Flight:"+ flight.toString(), Toast.LENGTH_SHORT).show();
-               // mDatabase.child("flights").child(firebaseAuth.getUid()).setValue(flight);
+                mDatabase.child("flights").child(firebaseAuth.getUid()).child(flightID).setValue(flight);
             }
         });
 

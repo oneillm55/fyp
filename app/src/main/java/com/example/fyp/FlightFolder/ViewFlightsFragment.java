@@ -1,11 +1,15 @@
 package com.example.fyp.FlightFolder;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +39,7 @@ public class ViewFlightsFragment extends Fragment {
     FlightAdapter flightAdapter;
     List<Flight> flightList;
     RecyclerView recyclerView;
+    private FlightAdapter.recyclerOnClickListener listener;
 
 
 
@@ -43,45 +48,73 @@ public class ViewFlightsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.fragment_view_flights,container,false);
         flightList = new ArrayList<>();
-        mDatabase = FirebaseDatabase.getInstance().getReference("trips");
+        firebaseAuth = FirebaseAuth.getInstance();
+        //firebaseUser = firebaseAuth.getCurrentUser();
+      //  userID = firebaseUser.getUid();
+        mDatabase = FirebaseDatabase.getInstance().getReference("flights").child(firebaseAuth.getUid());
+        Log.e("mdatabase", mDatabase.toString());
 
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.e("in on data change : ", "");
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-//                    Flight flight = dataSnapshot.getValue(Flight.class);
-//                    if(flight.getUuid().equalsIgnoreCase(firebaseUser.getUid())){
-//                        flightList.add(flight);
-//                    };
-//                    flightList.add(flight);
-
+                    Log.e("in for snapshot : ", "");
+                    Flight flight = dataSnapshot.getValue(Flight.class);
+                    flightList.add(flight);
+                    Log.e("list", "Items:" + flightList.size());
+                    //Log.e("list", "Items 1" + flightList.get(1).getArrive() + flightList.get(1).getFlightClass()+flightList.get(1).getDepart()+flightList.get(1).getFootprint()+flightList.get(1).getReturnFlight());
                 }
+
+               // flightList.add(new Flight("a", "b", "c", 1.0, true));
+                recyclerView = view.findViewById(R.id.flights_recycler_view);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+                recyclerView.setAdapter(new FlightAdapter(view.getContext(), flightList));
             }
+
+//            private void setOnClickListener() {
+//                listener = new FlightAdapter.recyclerOnClickListener() {
+//                    @Override
+//                    public void onClick(View v, int position) {
+//                        Toast.makeText(getContext(), "Click", Toast.LENGTH_SHORT).show();
+//                        //add to cart
+//
+//                        new AlertDialog.Builder(getContext())
+//                                .setTitle("Delete Flight")
+//                                .setMessage("Are you sure you want to delete this flight?")
+//
+//                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                                    public void onClick(DialogInterface dialog, int id) {
+//                                        //delete flight
+//
+//                                        //mDatabase.drop(flightID);
+//                                    }
+//                                })
+//
+//                                .setNegativeButton(android.R.string.no, null)
+//                                .setIcon(android.R.drawable.ic_dialog_alert)
+//                                .show();
+//                    }
+//                };
+//            }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+
+
         });
-      //  flightList.add(new Flight("a","b","10","123"));
-        recyclerView = view.findViewById(R.id.flights_recycler_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        recyclerView.setAdapter(new FlightAdapter(view.getContext(), flightList));
+
 
     return view;
     }
 
-//    @Override
-//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//        depart = view.findViewById(R.id.depart_name);
-//        arrival = view.findViewById(R.id.arrive_name);
-//        score = view.findViewById(R.id.flight_score);
-//        firebaseAuth = FirebaseAuth.getInstance();
-//    }
 
     }
+
+
 
 
 

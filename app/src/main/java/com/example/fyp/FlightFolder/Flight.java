@@ -4,13 +4,15 @@ public class Flight {
     private String Arrive;
     private String Depart;
     private String flightClass;
+    private String flightID;
     private double footprint;
     private boolean returnFlight;
 
-    public Flight(String arrive, String depart, String flightClass, double footprint, boolean returnFlight) {
+    public Flight(String arrive, String depart, String flightClass, String flightID, double footprint, boolean returnFlight) {
         Arrive = arrive;
         Depart = depart;
         this.flightClass = flightClass;
+        this.flightID = flightID;
         this.footprint = footprint;
         this.returnFlight = returnFlight;
     }
@@ -50,11 +52,20 @@ public class Flight {
         this.footprint = footprint;
     }
 
-    public boolean isReturnFlight() {
+    public boolean getReturnFlight() {
         return returnFlight;
     }
 
     public void setReturnFlight(boolean returnFlight) {
         this.returnFlight = returnFlight;
     }
+
+    public String getFlightID() {
+        return flightID;
+    }
+
+    public void setFlightID(String flightID) {
+        this.flightID = flightID;
+    }
+
 }
