@@ -63,14 +63,12 @@ public class HomeFragment extends Fragment {
                 if (snapshot.exists()) {
                     Footprint footprint = snapshot.getValue(Footprint.class);
                     flightCO2=footprint.getFlight();
-                    //Toast.makeText(getActivity(),"flStr"+flightCO2, Toast.LENGTH_SHORT).show();
                     clothingCO2=footprint.getClothing();
                     foodCO2=footprint.getFood();
                     totalCO2=foodCO2+flightCO2+clothingCO2;
                     setUpPieChart();
                     loadPieChartData();
-
-                    totalCO2TextView.setText(totalCO2+"Total CO2");
+                    totalCO2TextView.setText(String.format("%.2f", totalCO2)+"Total CO2");
                 }
             }
             @Override

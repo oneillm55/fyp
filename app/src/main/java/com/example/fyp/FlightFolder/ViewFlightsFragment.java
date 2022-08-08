@@ -57,14 +57,10 @@ public class ViewFlightsFragment extends Fragment {
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.e("in on data change : ", "");
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    Log.e("in for snapshot : ", "");
                     Flight flight = dataSnapshot.getValue(Flight.class);
                     flightList.add(flight);
-                    Log.e("list", "Items:" + flightList.size());
-                    //Log.e("list", "Items 1" + flightList.get(1).getArrive() + flightList.get(1).getFlightClass()+flightList.get(1).getDepart()+flightList.get(1).getFootprint()+flightList.get(1).getReturnFlight());
-                }
+                 }
 
                // flightList.add(new Flight("a", "b", "c", 1.0, true));
                 recyclerView = view.findViewById(R.id.flights_recycler_view);
