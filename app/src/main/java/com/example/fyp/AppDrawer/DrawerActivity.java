@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.fyp.FlightFolder.FlightFragment;
 import com.example.fyp.FoodFolder.FoodFragment;
@@ -88,7 +90,19 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         if(drawer.isDrawerOpen(GravityCompat.START)){
             drawer.closeDrawer(GravityCompat.START);
         }else{
+            //super.onBackPressed();
+        }
+
+        if (getSupportFragmentManager().findFragmentByTag("fragBack") != null) {
+
+        } else {
             super.onBackPressed();
+            return;
+        }
+        if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag("fragBack");
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().remove(fragment);
+            fragmentTransaction.commit();
         }
     }
 

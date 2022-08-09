@@ -9,8 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,7 +62,12 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
     private String userID, classString, returnString;
     private boolean returnFlight, calculationValid;
     private  double footprintInTonnes;
-    List<Flight> flightList;
+    private AutoCompleteTextView autoDepart, autoArrive;
+    private SearchView arriveSearchView;
+    private ListView arriveListView;
+    private List<Flight> flightList;
+    private List<String> filteredAirportList;
+    private String[] airports;
 
     @Nullable
     @Override
@@ -68,11 +76,14 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         depart = view.findViewById(R.id.editTextDepart);
         arrival = view.findViewById(R.id.editTextArrive);
+//        autoArrive = view.findViewById(R.id.autoCompleteArrive);
+//        autoDepart = view.findViewById(R.id.autoCompleteDepart);
         calculateFlightButton = view.findViewById(R.id.calculateFlightButton);
         viewFlightButton = view.findViewById(R.id.viewFlightButton);
         saveFlightButton = view.findViewById(R.id.saveFlightButton);
@@ -83,6 +94,9 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         mDatabase = FirebaseDatabase.getInstance().getReference();
         calculationValid = false;
         flightList = new ArrayList<>();
+        airports = getResources().getStringArray(R.array.airports);
+//        arriveSearchView = view.findViewById(R.id.arriveSearchView);
+//        arriveListView = view.findViewById(R.id.arriveListView);
 
         Spinner classSpinner = view.findViewById(R.id.class_spinner);
         ArrayAdapter<CharSequence> classAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.class_spinner_options, android.R.layout.simple_spinner_item);
@@ -96,13 +110,45 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         returnSpinner.setAdapter(returnAdapter);
         returnSpinner.setOnItemSelectedListener(this);
 
-
-        calculateFlightButton.setOnClickListener(new View.OnClickListener() {
+//        ArrayAdapter<String> airportAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_list_item_1, airports);
+//        autoArrive.setAdapter(airportAdapter);
+//        autoDepart.setAdapter(airportAdapter);
+//        arriveSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String s) {
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String s) {
+//                filteredAirportList = new ArrayList<>();
+//                for(String airport : airports){
+//                    if(airport.toLowerCase().contains(s.toLowerCase())){
+//
+//                        filteredAirportList.add(airport);
+//                    }
+//                }
+//                ArrayAdapter<String> airportAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, filteredAirportList);
+//               arriveListView.setAdapter(airportAdapter);
+//                return false;
+//            }
+//        });
+//
+//        arriveListView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//            }
+//        });
+//
+           calculateFlightButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
                 String bdepart = depart.getText().toString().trim();
                 String barrival = arrival.getText().toString().trim();
+//                  String bdepart = autoDepart.getText().toString().trim();
+//                  String barrival = autoArrive.getText().toString().trim();
                 classString = classSpinner.getSelectedItem().toString();
                 returnFlight = getReturnFlight();
 
@@ -115,6 +161,8 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                         @Override
                         public void run() {
                             try {
+
+                                //send bdepart and barrival to the airplabs api and get back their iata code
 
                                 URL url = new URL("https://api.goclimate.com/v1/flight_footprint?segments[0][origin]=" + bdepart + "&segments[0][destination]=" + barrival + "&cabin_class=" + getFlightClass());
                                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -180,8 +228,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
             public void onClick(View view) {
                 //launch view flights fragment
                 // Toast.makeText(getContext(), "View Flight:", Toast.LENGTH_SHORT).show();
-                getParentFragmentManager().beginTransaction().replace(R.id.flight_fragment_container, new ViewFlightsFragment())
-                        .commit();
+                getParentFragmentManager().beginTransaction().add(R.id.flight_fragment_container, new ViewFlightsFragment()).addToBackStack("fragBack").commit();
             }
         });
 
@@ -195,6 +242,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                 mDatabase.child("flights").child(firebaseAuth.getUid()).child(flightID).setValue(flight);
                 //update footprint with sum of all flights
                 updateUserTotalFootprint(flight.getFootprint());
+                 Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -208,8 +256,8 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
                 if (snapshot.exists()) {
                     Footprint footprint = snapshot.getValue(Footprint.class);
-                    Log.e("snapshot: ", String.valueOf(snapshot.getValue()));
-                    Log.e("footprint.getfl: ", String.valueOf(footprint.getFlight()));
+//                    Log.e("snapshot: ", String.valueOf(snapshot.getValue()));
+//                    Log.e("footprint.getfl: ", String.valueOf(footprint.getFlight()));
                     newFlightFootprint =footprint.getFlight() + d;
                     Log.e("new flight footprint : ", String.valueOf(newFlightFootprint));
                     mDatabase.child("footprint").child(firebaseAuth.getUid()).child("flight").setValue(newFlightFootprint);
@@ -273,5 +321,6 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
 
 }

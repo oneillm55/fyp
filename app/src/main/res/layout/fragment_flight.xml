@@ -58,6 +58,41 @@
             android:minHeight="48dp"
             android:textAlignment="center"
             android:textColorHint="#F6F6F6" />
+
+<!--        <AutoCompleteTextView-->
+<!--            android:id="@+id/autoCompleteDepart"-->
+<!--            android:layout_width="300dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:ems="10"-->
+<!--            android:textColorHint="#F6F6F6"-->
+<!--            android:minHeight="48dp"-->
+<!--            android:background="@android:color/transparent"-->
+<!--            android:hint="Depart From.."-->
+<!--            android:completionHint="Depart From.."-->
+<!--            android:completionThreshold="1"/>-->
+<!--        <AutoCompleteTextView-->
+<!--            android:id="@+id/autoCompleteArrive"-->
+<!--            android:layout_width="300dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:ems="10"-->
+<!--            android:textColorHint="#F6F6F6"-->
+<!--            android:minHeight="48dp"-->
+<!--            android:background="@android:color/transparent"-->
+<!--            android:hint="Arrive in.."-->
+<!--            android:completionThreshold="1"/>-->
+
+
+<!--        <SearchView-->
+<!--            android:id="@+id/arriveSearchView"-->
+<!--            android:layout_width="300dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:iconifiedByDefault="false"-->
+<!--            android:queryHint="Depart from.."/>-->
+<!--        <ListView-->
+<!--            android:id="@+id/arriveListView"-->
+<!--            android:layout_width="300dp"-->
+<!--            android:layout_height="48dp"/>-->
+
         <Spinner
             android:id="@+id/return_spinner"
             android:layout_width="300dp"
