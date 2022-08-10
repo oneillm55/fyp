@@ -62,7 +62,6 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
     public FlightAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View flightView = LayoutInflater.from(parent.getContext()).inflate(R.layout.flights_layout, parent,false);
         return new MyViewHolder(flightView);
-       // return new MyViewHolder(LayoutInflater.from(context).inflate(R.layout.flights_layout, parent, false));
     }
 
     @Override
@@ -86,10 +85,10 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
                                         //delete flight
                                         holder.mDatabase.child("flights").child(holder.firebaseAuth.getUid()).child(flight.getFlightID()).removeValue();
                                         flightList.clear();
-                                        notifyDataSetChanged();
                                         //update footprint total
                                         updateUserTotalFootprint(holder.mDatabase,holder.firebaseAuth.getUid(),flight.getFootprint());
 
+                                        notifyDataSetChanged();
 
                                     }
                                 })

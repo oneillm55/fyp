@@ -48,10 +48,7 @@ public class ViewFlightsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_view_flights, container, false);
         flightList = new ArrayList<>();
         firebaseAuth = FirebaseAuth.getInstance();
-        //firebaseUser = firebaseAuth.getCurrentUser();
-        //  userID = firebaseUser.getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference("flights").child(firebaseAuth.getUid());
-        Log.e("mdatabase", mDatabase.toString());
 
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -67,31 +64,6 @@ public class ViewFlightsFragment extends Fragment {
                 recyclerView.setAdapter(new FlightAdapter(view.getContext(), flightList));
             }
 
-//            private void setOnClickListener() {
-//                listener = new FlightAdapter.recyclerOnClickListener() {
-//                    @Override
-//                    public void onClick(View v, int position) {
-//                        Toast.makeText(getContext(), "Click", Toast.LENGTH_SHORT).show();
-//                        //add to cart
-//
-//                        new AlertDialog.Builder(getContext())
-//                                .setTitle("Delete Flight")
-//                                .setMessage("Are you sure you want to delete this flight?")
-//
-//                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-//                                    public void onClick(DialogInterface dialog, int id) {
-//                                        //delete flight
-//
-//                                        //mDatabase.drop(flightID);
-//                                    }
-//                                })
-//
-//                                .setNegativeButton(android.R.string.no, null)
-//                                .setIcon(android.R.drawable.ic_dialog_alert)
-//                                .show();
-//                    }
-//                };
-//            }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
