@@ -3,6 +3,7 @@
 
     <string name="navigation_drawer_open">Open Navigation drawer</string>
     <string name="navigation_drawer_close">Close Navigation drawer</string>
+    <string name="go_climate_api_key">311e02419b9ceb0523ef1a5f</string>
 
     <string-array name="meat_spinner_options">
         <item>Most meals</item>
@@ -37,8 +38,12 @@
     </string-array>
 
     <string-array name="airports">
-        <item>Dublin Airport</item>
-        <item>Shannon Airport</item>
+        <item>Barcelona(BCR)</item>
+        <item>Dublin(DUB)</item>
+        <item>Hong Kong International(HKG)</item>
+        <item>London Heathrow(LHR)</item>
+        <item>Los Angeles International(LAX)</item>
+        <item>Shannon(SNN)</item>
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -14,11 +14,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.utils.widget.ImageFilterButton;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fyp.Footprint;
 import com.example.fyp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -43,7 +47,7 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             firebaseAuth = FirebaseAuth.getInstance();
-            mDatabase = FirebaseDatabase.getInstance().getReference("flights").child(firebaseAuth.getUid());
+            mDatabase = FirebaseDatabase.getInstance().getReference();
             arrive = itemView.findViewById(R.id.depart_name);
             depart = itemView.findViewById(R.id.arrive_name);
             flightClass = itemView.findViewById(R.id.flight_class);
@@ -80,11 +84,13 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         //delete flight
-                                        holder.mDatabase.child(flight.getFlightID()).removeValue();
-                                        //holder.priceGroup.removeAllViews();
+                                        holder.mDatabase.child("flights").child(holder.firebaseAuth.getUid()).child(flight.getFlightID()).removeValue();
                                         flightList.clear();
-                                      //  List<Flight> flightList;
                                         notifyDataSetChanged();
+                                        //update footprint total
+                                        updateUserTotalFootprint(holder.mDatabase,holder.firebaseAuth.getUid(),flight.getFootprint());
+
+
                                     }
                                 })
 
@@ -105,5 +111,24 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
         void onClick(View v, int position);
     }
 
+    private void updateUserTotalFootprint(DatabaseReference db,String uid, double d) {
+        db.child("footprint").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            double newFlightFootprint;
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if (snapshot.exists()) {
+                    Footprint footprint = snapshot.getValue(Footprint.class);
+                    newFlightFootprint = footprint.getFlight() - d;
+                    db.child("footprint").child(uid).child("flight").setValue(newFlightFootprint);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
 
 }

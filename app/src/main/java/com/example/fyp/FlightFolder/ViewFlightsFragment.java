@@ -42,27 +42,25 @@ public class ViewFlightsFragment extends Fragment {
     private FlightAdapter.recyclerOnClickListener listener;
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view= inflater.inflate(R.layout.fragment_view_flights,container,false);
+        View view = inflater.inflate(R.layout.fragment_view_flights, container, false);
         flightList = new ArrayList<>();
         firebaseAuth = FirebaseAuth.getInstance();
         //firebaseUser = firebaseAuth.getCurrentUser();
-      //  userID = firebaseUser.getUid();
+        //  userID = firebaseUser.getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference("flights").child(firebaseAuth.getUid());
         Log.e("mdatabase", mDatabase.toString());
 
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Flight flight = dataSnapshot.getValue(Flight.class);
                     flightList.add(flight);
-                 }
+                }
 
-               // flightList.add(new Flight("a", "b", "c", 1.0, true));
                 recyclerView = view.findViewById(R.id.flights_recycler_view);
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
@@ -99,16 +97,10 @@ public class ViewFlightsFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-
-
         });
-
-
-    return view;
+        return view;
     }
-
-
-    }
+}
 
 
 
