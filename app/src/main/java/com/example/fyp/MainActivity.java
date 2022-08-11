@@ -54,7 +54,9 @@ public class MainActivity extends AppCompatActivity {
 
                             if(task.isSuccessful()){
                                 // checkVerification();
-                                startActivity(new Intent(MainActivity.this, DrawerActivity.class));
+                                Intent intent = new Intent(MainActivity.this, DrawerActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);//prevents user being able to press back button to return to login screen
+                                startActivity(intent);
 
                             }else{
                                 Toast.makeText(getApplicationContext(), "Username and/or password not recognised", Toast.LENGTH_SHORT).show();
@@ -80,9 +82,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    public void onBackPressed() {
-        //do nothing, this empty method is to prevent the user going back in the app after logout
-    }
+//    public void onBackPressed() {
+//        //do nothing, this empty method is to prevent the user going back in the app after logout
+//    }
 
     private void checkVerification() {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();

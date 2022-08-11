@@ -71,6 +71,7 @@ public class UserFragment extends Fragment {
             public void onClick(View view) {
                 firebaseAuth.signOut();
                 Intent intent = new Intent(getActivity(),MainActivity.class );
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);//prevents user from being able to go back to this page after log out using back button
                 startActivity(intent);
                // finish();
                 //Toast.makeText(getActivity(), "Logout Successful")
