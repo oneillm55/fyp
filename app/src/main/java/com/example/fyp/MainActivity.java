@@ -80,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    public void onBackPressed() {
+        //do nothing, this empty method is to prevent the user going back in the app after logout
+    }
 
     private void checkVerification() {
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();

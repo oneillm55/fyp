@@ -20,7 +20,7 @@ import com.example.fyp.HomeFragment;
 import com.example.fyp.R;
 import com.example.fyp.UserFolder.User;
 import com.example.fyp.UserFolder.UserFragment;
-import com.example.fyp.UtilitiesFolder.UtilitiesFragment;
+import com.example.fyp.ClothingFolder.ClothingFragment;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -122,9 +122,9 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new FoodFragment()).commit();
                 break;
-            case R.id.nav_utilities:
+            case R.id.nav_clothing:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new UtilitiesFragment()).commit();
+                        new ClothingFragment()).commit();
                 break;
             case R.id.nav_account:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,

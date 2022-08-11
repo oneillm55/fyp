@@ -16,9 +16,9 @@
             android:icon="@drawable/ic_baseline_fastfood_24"
             android:title="Calculate Food Consumption" />
         <item
-            android:id="@+id/nav_utilities"
-            android:icon="@drawable/ic_baseline_fireplace_24"
-            android:title="Calculate Utilities" />
+            android:id="@+id/nav_clothing"
+            android:icon="@drawable/hanger"
+            android:title="Calculate Clothing" />
         <item
             android:id="@+id/nav_pledge"
             android:icon="@drawable/ic_baseline_pledge_24"

@@ -8,13 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.fyp.MainActivity;
 import com.example.fyp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -33,6 +36,7 @@ public class UserFragment extends Fragment {
     DatabaseReference mDatabase;
     FirebaseUser firebaseUser;
     String userId, emailString,usernameString;
+    Button logoutButton;
 
 
     @Nullable
@@ -41,11 +45,10 @@ public class UserFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_user,container,false);
         userEmail= view.findViewById(R.id.textViewEmail);
         username= view.findViewById(R.id.textViewUsername);
+        logoutButton = view.findViewById(R.id.logoutButton);
         firebaseAuth = FirebaseAuth.getInstance();
-       // userData=getIntent();
 
         userEmail.setText("Email:\n "+emailString);
-       // username.setText("Username:\n "+usernameString);
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users").child(firebaseAuth.getUid());
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -62,6 +65,17 @@ public class UserFragment extends Fragment {
 
                 }
             });
+
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                firebaseAuth.signOut();
+                Intent intent = new Intent(getActivity(),MainActivity.class );
+                startActivity(intent);
+               // finish();
+                //Toast.makeText(getActivity(), "Logout Successful")
+            }
+        });
 
          return view;
     }
