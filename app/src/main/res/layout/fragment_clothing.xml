@@ -1,15 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/green_background"
-    android:id="@+id/flight_utilities">
+    android:id="@+id/flight_utilities"
+    android:orientation="vertical">
     <ImageView
         android:id="@+id/flightIcon"
-        android:layout_width="203dp"
-        android:layout_height="168dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
         android:layout_marginTop="24dp"
         android:src="@drawable/hanger"
-        android:layout_centerInParent="true"/>
+        android:layout_gravity="center_vertical"/>
+    <TextView
+        android:id="@+id/clothesTotal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        />
+    <TextView
+        android:id="@+id/airDryTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="What % of the time do you Air dry your clothes after a wash?"
+        android:textColor="@color/black"
+        android:paddingTop="20dp"
+        />
+    <com.google.android.material.slider.Slider
+        android:id="@+id/airDrySlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:value="0.0"
+        android:valueFrom="0.0"
+        android:valueTo="100.0"
+        android:stepSize="10.0"/>
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/secondHandTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="What % of your clothes are purchased second hand?"
+        android:textColor="@color/black"
+        android:paddingTop="20dp"
+        />
+    <com.google.android.material.slider.Slider
+        android:id="@+id/secondHandSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:value="0.0"
+        android:valueFrom="0.0"
+        android:valueTo="100.0"
+        android:stepSize="10.0"/>
+
+    <TextView
+        android:id="@+id/sustainableTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="What % of your clothes are purchased from sustainable brands?"
+        android:textColor="@color/black"
+        android:paddingTop="20dp"
+        />
+    <com.google.android.material.slider.Slider
+        android:id="@+id/sustainableSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:value="0.0"
+        android:valueFrom="0.0"
+        android:valueTo="100.0"
+        android:stepSize="10.0"/>
+
+    <TextView
+        android:id="@+id/coldWashTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Out of 5 loads of laundry, how many would you say are done on a cold wash?"
+        android:textColor="@color/black"
+        android:paddingTop="20dp"
+        />
+    <com.google.android.material.slider.Slider
+        android:id="@+id/coldWashSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:value="0.0"
+        android:valueFrom="0.0"
+        android:valueTo="5.0"
+        android:stepSize="1.0"/>
+
+    <Button
+        android:id="@+id/clothingButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:text="Go"/>
+
+
+
+</LinearLayout>
