@@ -1,8 +1,10 @@
 package com.example.fyp.AppDrawer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +16,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
 import com.example.fyp.FlightFolder.FlightFragment;
 import com.example.fyp.FoodFolder.FoodFragment;
 import com.example.fyp.HomeFragment;
@@ -32,6 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawer;
     private TextView email,username;
+    private ImageView profileImage;
     private FirebaseAuth firebaseAuth;
 
     @Override
@@ -46,8 +50,9 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header = navigationView.getHeaderView(0);
-        email= header.findViewById(R.id.nav_header_email);
-        username= header.findViewById(R.id.nav_header_username);
+        email = header.findViewById(R.id.nav_header_email);
+        username = header.findViewById(R.id.nav_header_username);
+        profileImage = header.findViewById(R.id.nav_header_image);
 
         //handles the hamburger menu in the top left of the screen, requires strings as input for visually impaired people
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawer,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
@@ -75,6 +80,8 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
                     email.setText(user.getEmail());
                     username.setText(user.getUsernname());
 
+                    Glide.with(DrawerActivity.this).load(R.drawable.footprint_solid).into(profileImage);
+
                 }
             }
             @Override
@@ -82,7 +89,14 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
             }
         });
+
     }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -144,4 +158,6 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
         return true;
     }
+
+
 }
