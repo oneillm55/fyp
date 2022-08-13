@@ -28,8 +28,8 @@
         android:hint="Email"
         android:inputType="textEmailAddress"
         android:minHeight="48dp"
-        android:textAlignment="center"
-        android:textColorHint="#F6F6F6"
+        android:drawableLeft="@drawable/ic_baseline_person_outline_24"
+        android:drawablePadding="4dp"
         app:layout_constraintBottom_toTopOf="@+id/editTextPassword"
         app:layout_constraintEnd_toEndOf="@+id/editTextPassword"
         app:layout_constraintStart_toStartOf="@+id/editTextPassword" />
@@ -44,8 +44,8 @@
         android:hint="Password"
         android:inputType="textPassword"
         android:minHeight="48dp"
-        android:textAlignment="center"
-        android:textColorHint="#F6F6F6"
+        android:drawableLeft="@drawable/ic_baseline_key_24"
+        android:drawablePadding="4dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonLogin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

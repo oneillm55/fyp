@@ -15,12 +15,31 @@ import androidx.fragment.app.Fragment;
 
 import com.example.fyp.R;
 import com.google.android.material.slider.Slider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.UUID;
 
 public class ClothingFragment extends Fragment {
-    Slider airDrySlider, secondHandSlider, sustainableSlider, coldWashSlider;
-    double airDryValue, secondHandValue, sustainableValue, coldwashValue;
+    Slider airDrySlider, secondHandSlider, sustainableSlider, coldWashSlider,returnSlider,returnOnlineSlider;
+    double airDryLbs, secondHandLbs, sustainableLbs, coldWashLbs, returnLbs,returnOnlineValue, totalLbs;
+    boolean airDryEdited, secondHandEdited, sustainableEdited, coldWashEdited,returnEdited,returnOnlineEdited;// status of if a slider has been used yet in the app
+    TextView clothesTotal, airDryTextView, secondHandTextView, sustainableTextView, coldWashTextView,returnTextView,returnOnlineTextView, buyingTextView;//these store the questions related to each slider
     Button button;
-    TextView clothesTotal;
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference mDatabase;
+    private FirebaseUser firebaseUser;
+    private String userID;
+
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     @Nullable
     @Override
@@ -28,7 +47,7 @@ public class ClothingFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_clothing, container, false);
     }
 
-    @SuppressLint("ResourceType")
+    @SuppressLint("ResourceType")//to allow use of ints as ids for spinners
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -36,54 +55,112 @@ public class ClothingFragment extends Fragment {
         secondHandSlider = view.findViewById(R.id.secondHandSlider);
         sustainableSlider = view.findViewById(R.id.sustainableSlider);
         coldWashSlider = view.findViewById(R.id.coldWashSlider);
+        returnSlider=view.findViewById(R.id.returnSlider);
+        returnOnlineSlider=view.findViewById(R.id.returnOnlineSlider);
         button = view.findViewById(R.id.clothingButton);
         clothesTotal =  view.findViewById(R.id.clothesTotal);
+        returnOnlineTextView= view.findViewById(R.id.returnOnlineTextView);
+        secondHandTextView = view.findViewById(R.id.secondHandTextView);
+        sustainableTextView= view.findViewById(R.id.sustainableTextView);
+        coldWashTextView= view.findViewById(R.id.coldWashTextView);
+        returnTextView= view.findViewById(R.id.returnTextView);
+        returnOnlineTextView= view.findViewById(R.id.returnOnlineTextView);
+        buyingTextView = view.findViewById(R.id.buyingTextView);
+        airDryTextView = view.findViewById(R.id.airDryTextView);
 
-        setSliderValues();
-        airDrySlider.setId(1);
-        secondHandSlider.setId(2);
-        sustainableSlider.setId(3);
-        coldWashSlider.setId(4);
+
+        userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        //set ids so the app knows what order to set questions visible
+        coldWashSlider.setId(1);
+        airDrySlider.setId(2);
+        secondHandSlider.setId(3);
+        sustainableSlider.setId(4);
+        returnSlider.setId(5);
+        returnOnlineSlider.setId(6);
+
+        //create instance of the slider touch listener and assign it to each slider
         MyOnSliderTouchListener listener = new MyOnSliderTouchListener();
         airDrySlider.addOnSliderTouchListener(listener);
         secondHandSlider.addOnSliderTouchListener(listener);
         sustainableSlider.addOnSliderTouchListener(listener);
         coldWashSlider.addOnSliderTouchListener(listener);
+        returnSlider.addOnSliderTouchListener(listener);
+        returnOnlineSlider.addOnSliderTouchListener(listener);
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "values"+airDryValue+ secondHandValue+ sustainableValue+ coldwashValue, Toast.LENGTH_SHORT).show();
-                clothesTotal.setText(String.valueOf(calculateClothesTotal()+"lbs of CO2"));
+                totalLbs=round(calculateClothesTotal(),2);
+                clothesTotal.setText(String.valueOf(totalLbs+"lbs of CO2"));
+                final String clothingID = UUID.randomUUID().toString();//create a unique id for a flight
+                Clothing clothing = new Clothing(airDryLbs, secondHandLbs, sustainableLbs, coldWashLbs, returnLbs,totalLbs, airDrySlider.getValue(), secondHandSlider.getValue(), sustainableSlider.getValue(),coldWashSlider.getValue(), returnSlider.getValue(),returnOnlineSlider.getValue());
+                mDatabase.child("clothing").child(userID).child(clothingID).setValue(clothing);
+                updateUserFootprint(convertPoundToTon(calculateClothesTotal()));
+                Toast.makeText(getContext(), "Clothing data Saved", Toast.LENGTH_SHORT).show();
 
             }
         });
 
 
-//        airDrySlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
-//            @Override
-//            public void onStartTrackingTouch(@NonNull Slider slider) {
-//
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(@NonNull Slider slider) {
-//                airDryValue = slider.getValue();
-//            }
-//        });
-
+    }
+    public double convertPoundToTon(double pound) {
+        return (double) (pound * 0.000453592);
+        // return 1.0;
     }
 
-    private void setSliderValues() {
-        airDryValue = airDrySlider.getValue();
-        secondHandValue = secondHandSlider.getValue();
-        sustainableValue = sustainableSlider.getValue();
-        coldwashValue = coldWashSlider.getValue();
+    public void updateUserFootprint(double d) {
+        mDatabase.child("footprint").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    mDatabase.child("footprint").child(userID).child("clothing").setValue(d);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
     }
 
     private double calculateClothesTotal() {
-       // double d=(secondHandValue*6.59)+(airDryValue*4.47)+(sustainableValue*2.79)+(coldwashValue*.43);
-        return ((100-secondHandValue)*6.59)+(447-(airDryValue*4.47))+(279-(sustainableValue*2.79))+((coldwashValue*8.6));//use 8.6 for coldwash because its 43/5(the number of washes a week)
+
+        if(airDryEdited) {//check if the user has interacted with the slider
+            airDryLbs =(447-(airDrySlider.getValue()*89.4));//447/5 as it uses 1-5 slider not 1-100
+        }
+
+        if(coldWashEdited) {
+            coldWashLbs =(43-(coldWashSlider.getValue()*8.6));
+        }
+
+        if(secondHandEdited) {
+            secondHandLbs =(659-(secondHandSlider.getValue()*6.59));
+        }
+
+        if(sustainableEdited) {
+            sustainableLbs =(279-(sustainableSlider.getValue()*2.79));
+        }
+
+        if(returnEdited) {
+            returnLbs =returnSlider.getValue()*1;//1lbs od co2 per return from Thred up calculator
+        }
+
+        if(returnOnlineEdited) {
+            returnLbs = returnLbs -(returnOnlineSlider.getValue()*0.6);//online returns are 60% more efficient so for every % that's returned online vs returned normally -.6lbs of carbon
+        }
+
+
+        return airDryLbs + secondHandLbs + sustainableLbs + coldWashLbs + returnLbs;
+    }
+
+    public double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     public class MyOnSliderTouchListener implements Slider.OnSliderTouchListener {
@@ -93,28 +170,66 @@ public class ClothingFragment extends Fragment {
 
         }
 
+        @SuppressLint("ResourceType")//to allow use of ints as ids for spinners
         @Override
         public void onStopTrackingTouch(@NonNull Slider slider) {
 
-            switch (slider.getId()) {
+
+            switch (slider.getId()) {// this switch case takes the slider that has been used and sets its edited status to true and makes the next relative slider and question visible
                 case 1:
-                    airDryValue = slider.getValue();
-                    clothesTotal.setText(String.valueOf(calculateClothesTotal()+"lbs of CO2"));
-                    break;
+                    //coldwash Q
+                    coldWashEdited=true;
+                        airDryTextView.setVisibility(View.VISIBLE);
+                        airDrySlider.setVisibility(View.VISIBLE);
+                    updateDisplayTotal();
+                break;
                 case 2:
-                    secondHandValue = slider.getValue();
-                    clothesTotal.setText(String.valueOf(calculateClothesTotal()+"lbs of CO2"));
+                    //Air dry Q
+                    airDryEdited=true;
+                    buyingTextView.setVisibility(View.VISIBLE);
+                    secondHandTextView.setVisibility(View.VISIBLE);
+                    secondHandSlider.setVisibility(View.VISIBLE);
+                    updateDisplayTotal();
                     break;
                 case 3:
-                    sustainableValue = slider.getValue();
-                    clothesTotal.setText(String.valueOf(calculateClothesTotal()+"lbs of CO2"));
+                    secondHandEdited=true;
+                    sustainableTextView.setVisibility(View.VISIBLE);
+                    sustainableSlider.setVisibility(View.VISIBLE);
+                    updateDisplayTotal();
                     break;
                 case 4:
-                    coldwashValue = slider.getValue();
-                    clothesTotal.setText(String.valueOf(calculateClothesTotal()+"lbs of CO2"));
+                    //sustainable q
+                    sustainableEdited=true;
+                    returnTextView.setVisibility(View.VISIBLE);
+                    returnSlider.setVisibility(View.VISIBLE);
+                    updateDisplayTotal();
+                    break;
+                case 5:
+                    //return q
+                    returnEdited=true;
+                    if(returnSlider.getValue()==0){
+                        returnOnlineTextView.setVisibility(View.GONE);
+                        returnOnlineSlider.setVisibility(View.GONE);
+                        updateDisplayTotal();
+                    }else {
+                        returnOnlineTextView.setVisibility(View.VISIBLE);
+                        returnOnlineSlider.setVisibility(View.VISIBLE);
+                        button.setVisibility(View.VISIBLE);
+                        updateDisplayTotal();
+                    }
+                   break;
+                case 6:
+                    //return online q
+                    returnOnlineEdited=true;
+                    updateDisplayTotal();
                     break;
             }
         }
+
+        public void updateDisplayTotal(){
+            clothesTotal.setText(String.valueOf(df.format(calculateClothesTotal())+"lbs of CO2"));
+        }
+
 
 
     }

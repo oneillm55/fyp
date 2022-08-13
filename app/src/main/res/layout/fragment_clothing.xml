@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/green_background"
     android:id="@+id/flight_utilities"
-    android:orientation="vertical">
+    android:fadeScrollbars="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
     <ImageView
         android:id="@+id/flightIcon"
         android:layout_width="match_parent"
@@ -20,12 +25,38 @@
         android:textColor="@color/black"
         />
     <TextView
+        android:id="@+id/washingTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="The average household does 5 loads of laundry a week, in your home how many wold you say are.."
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:paddingTop="20dp"
+        />
+        <TextView
+            android:id="@+id/coldWashTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Done on a cold wash?"
+            android:textColor="@color/black"
+            android:paddingTop="20dp"
+            />
+        <com.google.android.material.slider.Slider
+            android:id="@+id/coldWashSlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:value="0.0"
+            android:valueFrom="0.0"
+            android:valueTo="5.0"
+            android:stepSize="1.0"/>
+    <TextView
         android:id="@+id/airDryTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="What % of the time do you Air dry your clothes after a wash?"
+        android:text="Air dried?"
         android:textColor="@color/black"
         android:paddingTop="20dp"
+        android:visibility="gone"
         />
     <com.google.android.material.slider.Slider
         android:id="@+id/airDrySlider"
@@ -33,16 +64,30 @@
         android:layout_height="wrap_content"
         android:value="0.0"
         android:valueFrom="0.0"
-        android:valueTo="100.0"
-        android:stepSize="10.0"/>
+        android:valueTo="5.0"
+        android:stepSize="1.0"
+        android:visibility="gone"/>
+
+
+    <TextView
+        android:id="@+id/buyingTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="The average person buys 66 new garments a year.\nWhat % of the clothing you purchase are.."
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:paddingTop="20dp"
+        android:visibility="gone"
+        />
 
     <TextView
         android:id="@+id/secondHandTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="What % of your clothes are purchased second hand?"
+        android:text="Purchased second hand?"
         android:textColor="@color/black"
         android:paddingTop="20dp"
+        android:visibility="gone"
         />
     <com.google.android.material.slider.Slider
         android:id="@+id/secondHandSlider"
@@ -51,15 +96,17 @@
         android:value="0.0"
         android:valueFrom="0.0"
         android:valueTo="100.0"
-        android:stepSize="10.0"/>
+        android:stepSize="10.0"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/sustainableTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="What % of your clothes are purchased from sustainable brands?"
+        android:text="Purchased from sustainable brands?"
         android:textColor="@color/black"
         android:paddingTop="20dp"
+        android:visibility="gone"
         />
     <com.google.android.material.slider.Slider
         android:id="@+id/sustainableSlider"
@@ -68,32 +115,55 @@
         android:value="0.0"
         android:valueFrom="0.0"
         android:valueTo="100.0"
-        android:stepSize="10.0"/>
-
+        android:stepSize="10.0"
+        android:visibility="gone"/>
     <TextView
-        android:id="@+id/coldWashTextView"
+        android:id="@+id/returnTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Out of 5 loads of laundry, how many would you say are done on a cold wash?"
+        android:text="Returned?"
         android:textColor="@color/black"
         android:paddingTop="20dp"
+        android:visibility="gone"
         />
     <com.google.android.material.slider.Slider
-        android:id="@+id/coldWashSlider"
+        android:id="@+id/returnSlider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:value="0.0"
         android:valueFrom="0.0"
-        android:valueTo="5.0"
-        android:stepSize="1.0"/>
+        android:valueTo="100.0"
+        android:stepSize="10.0"
+        android:visibility="gone"/>
+    <TextView
+        android:id="@+id/returnOnlineTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Are returned online?"
+        android:textColor="@color/black"
+        android:paddingTop="20dp"
+        android:visibility="gone"
+        />
+    <com.google.android.material.slider.Slider
+        android:id="@+id/returnOnlineSlider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:value="0.0"
+        android:valueFrom="0.0"
+        android:valueTo="100.0"
+        android:stepSize="10.0"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/clothingButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
-        android:text="Go"/>
+        android:text="Save Results"
+        android:visibility="gone"/>
+
+    </LinearLayout>
 
 
 
-</LinearLayout>
+</ScrollView>
