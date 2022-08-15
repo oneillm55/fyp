@@ -23,13 +23,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-public class FoodFragment extends Fragment implements AdapterView.OnItemSelectedListener, View.OnClickListener {
+public class FoodFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     String meatString,dairyString, compostString, organicString,shoppingString;
     TextView displayTextView;
-    double foodValue;
+    private double foodValue, meatValue,dairyValue, compostValue, organicValue,shoppingValue;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mDatabase;
     private String userID;
@@ -86,7 +88,16 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
         displayTextView =  view.findViewById(R.id.textViewDisplay);
 
         Button calculateButton = view.findViewById(R.id.calculateFoodButton);
-        calculateButton.setOnClickListener(this);
+        calculateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateDisplay();
+                mDatabase.child("footprint").child(firebaseAuth.getUid()).child("food").setValue(getFoodCO2());
+                // to do only update this data when user wants to save input ie allow them to check the value based on their input into the spinners before they save it to firebase
+                Food food = new Food(meatString,dairyString, compostString, organicString,shoppingString,meatValue,dairyValue,compostValue,organicValue,shoppingValue,foodValue);
+                mDatabase.child("food").child(firebaseAuth.getUid()).setValue(food);
+            }
+        });
     }
 
 
@@ -120,19 +131,24 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
     }
 
 
-    @Override
-    public void onClick(View view) {
-        updateDisplay();
-        mDatabase.child("footprint").child(firebaseAuth.getUid()).child("food").setValue(getFoodCO2());
-        // to do only update this data when user wants to save input ie allow them to check the value based on their input into the spinners before they save it to firebase
-    }
-
 
 
     public double getFoodCO2() {
 
-        double value=0;
-        switch(meatString) {
+        getMeatCO2();
+        getDairyCO2();
+        getCompostCO2();
+        getOrganicCO2();
+        getShoppingCO2();
+
+        //foodValue=value;
+        return meatValue+dairyValue+compostValue+organicValue+shoppingValue;
+    }
+
+    public double getMeatCO2() {
+
+        double value = 0;
+        switch (meatString) {
             case "Never":
                 break;
             case "Occasionally":
@@ -145,17 +161,31 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
                 value = value + .33;
                 break;
         }
+        meatValue= value;
+        return meatValue;
+    }
+
+    public double getDairyCO2() {
+
+        double value = 0;
         switch(dairyString) {
             case "Never":
                 break;
             case "Occasionally":
                 value = value + .04;
                 break;
-            case "Everyday":
+            case "Every day":
                 value = value + .07;
                 break;
         }
 
+        dairyValue= value;
+        return dairyValue;
+    }
+
+    public double getCompostCO2() {
+
+        double value = 0;
         switch(compostString) {
             case "Yes":
                 break;
@@ -163,19 +193,13 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
                 value = value + .03;
                 break;
         }
+        compostValue= value;
+        return compostValue;
+    }
 
-        switch(organicString) {
-            case "None":
-                value = value + .06;
-                break;
-            case "Some":
-                value = value + .03;
-                break;
-            case "Most":
-                value = value + .03; //to do find accurate number
-                break;
-        }
+    public double getShoppingCO2() {
 
+        double value = 0;
         switch(shoppingString) {
             case "Only local produce":
                 value = value + .03;//to do find accurate number
@@ -190,14 +214,41 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
                 value = value + .21;
                 break;
         }
-
-        //foodValue=value;
-        return value;
+        shoppingValue= value;
+        return shoppingValue;
     }
 
+    public double getOrganicCO2() {
+
+        double value = 0;
+        switch(organicString) {
+            case "None":
+                value = value + .06;
+                break;
+            case "Some":
+                value = value + .03;
+                break;
+            case "Most":
+                value = value + .03; //to do find accurate number
+                break;
+        }
+        organicValue= value;
+        return organicValue;
+    }
+
+
     public void updateDisplay(){
-        displayTextView.setText( df.format(getFoodCO2()) + " tonnes of CO2");
+        foodValue=round(getFoodCO2(),2);
+        displayTextView.setText( foodValue  + " Tonnes of CO2");
     };
+
+    public double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
 
 
 }
