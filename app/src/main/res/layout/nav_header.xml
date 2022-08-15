@@ -4,13 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="220dp"
     android:gravity="bottom"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:id="@+id/nav_header">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/nav_header_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher_round"/>
+        android:src="@mipmap/ic_launcher_round" />
 
     <TextView
         android:id="@+id/nav_header_username"

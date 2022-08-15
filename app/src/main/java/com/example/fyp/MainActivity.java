@@ -24,11 +24,19 @@ public class MainActivity extends AppCompatActivity {
     private EditText email, password;
     private Button loginButton, signupButton;
     private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser =firebaseAuth.getCurrentUser();
+
+        if(firebaseUser!=null){
+            startActivity(new Intent(MainActivity.this, DrawerActivity.class));
+        }
         setContentView(R.layout.activity_main);
         email = findViewById(R.id.editTextEmail);
         password = findViewById(R.id.editTextPassword);

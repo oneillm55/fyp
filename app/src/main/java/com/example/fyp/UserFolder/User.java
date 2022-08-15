@@ -5,11 +5,13 @@ public class User {
     String usernname;
     String email;
     String password;
+    String imageID;
 
-    public User(String usernname, String email, String password) {
+    public User(String usernname, String email, String password,String imageChanged) {
         this.usernname = usernname;
         this.email = email;
         this.password = password;
+        this.imageID = imageChanged;
     }
 
 
@@ -42,4 +44,11 @@ public class User {
         this.password = password;
     }
 
+    public String getImageID() {
+        return imageID;
+    }
+
+    public void setImageID(String imageID) {
+        this.imageID = imageID;
+    }
 }

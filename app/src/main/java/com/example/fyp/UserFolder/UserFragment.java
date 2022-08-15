@@ -7,11 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,13 +16,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+
+import com.bumptech.glide.request.RequestOptions;
+import com.example.fyp.GlideApp;
 import com.example.fyp.MainActivity;
 import com.example.fyp.R;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -47,12 +44,13 @@ public class UserFragment extends Fragment {
     FirebaseAuth firebaseAuth;
     DatabaseReference mDatabase;
     FirebaseUser firebaseUser;
-    String userId, emailString,usernameString;
+    String userID, emailString,usernameString, imageKey;
     Button logoutButton, saveButton;
-    ImageView profilePicture;
+    ImageView profileImage;
     public Uri imageUri;
     private FirebaseStorage storage;
     private StorageReference storageReference;
+    DatabaseReference databaseReference;
 
 
     @Nullable
@@ -63,14 +61,18 @@ public class UserFragment extends Fragment {
         username= view.findViewById(R.id.textViewUsername);
         logoutButton = view.findViewById(R.id.logoutButton);
         saveButton = view.findViewById(R.id.saveButton);
-        profilePicture = view.findViewById(R.id.userProfilePicture);
+        profileImage = view.findViewById(R.id.userProfilePicture);
         firebaseAuth = FirebaseAuth.getInstance();
+        userID = firebaseAuth.getUid();
+
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
         userEmail.setText("Email:\n "+emailString);
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users").child(firebaseAuth.getUid());
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("users").child(userID);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -78,6 +80,16 @@ public class UserFragment extends Fragment {
                     User user = snapshot.getValue(User.class);
                     userEmail.setText(user.getEmail());
                     username.setText(user.getUsernname());
+                    if (getActivity() == null) {//prevents crash from glide trying to use getactivity from the fragment being detached before getting a response from firebase
+                        return;
+                    }
+
+                    if(user.getImageID().isEmpty()){
+
+                        GlideApp.with(getActivity()).load(R.drawable.ic_baseline_person_outline_24).apply(new RequestOptions().override(200, 200)).into(profileImage);
+                    }else {
+                        GlideApp.with(getActivity()).load(storageReference.child("images").child(user.getImageID())).apply(new RequestOptions().override(200, 200)).into(profileImage);
+                    }
                 }
             }
                 @Override
@@ -98,11 +110,11 @@ public class UserFragment extends Fragment {
             }
         });
 
-        profilePicture.setOnClickListener(new View.OnClickListener() {
+        profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 chooseImage();
-                saveButton.setVisibility(View.VISIBLE);
+
 
             }
         });
@@ -134,20 +146,26 @@ public class UserFragment extends Fragment {
         Log.e("In on activity result", String.valueOf(requestCode) +String.valueOf(resultCode));
         if(requestCode==1 && resultCode==-1 && data!=null && data.getData()!=null){
             imageUri = data.getData();
-            profilePicture.setImageURI(imageUri);
+            profileImage.setImageURI(imageUri);
+            saveButton.setVisibility(View.VISIBLE);
 
         }
     }
 
 
     private void uploadImage() {
-        StorageReference sr = storageReference.child("images/" + userId);
+        final String randomKey = UUID.randomUUID().toString();
+        imageKey = randomKey;
+        StorageReference sr = storageReference.child("images/" + imageKey);
+
 
        sr.putFile(imageUri)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Toast.makeText(getActivity(), "Image Uploaded successfully", Toast.LENGTH_SHORT).show();
+                        //set user imageChanged to current time stamp
+                        updateImageChanged();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -159,4 +177,11 @@ public class UserFragment extends Fragment {
                 });
     }
 
+    private void updateImageChanged() {
+        //set the users ImageID varible to be the time the image was edited
+        mDatabase.child("users").child(userID).child("imageID").setValue(imageKey);
+
     }
+
+
+}

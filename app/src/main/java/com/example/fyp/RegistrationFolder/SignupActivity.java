@@ -88,7 +88,7 @@ public class SignupActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "Registration Complete", Toast.LENGTH_SHORT).show();
 
                                 //realtime
-                                 User user = new User(busername,bemail,bpassword);
+                                 User user = new User(busername,bemail,bpassword,null);
 
                                  mDatabase.child("users").child(userID).setValue(user);
 

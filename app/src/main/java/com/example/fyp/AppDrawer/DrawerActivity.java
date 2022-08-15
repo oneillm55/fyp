@@ -17,8 +17,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.fyp.FlightFolder.FlightFragment;
 import com.example.fyp.FoodFolder.FoodFragment;
+import com.example.fyp.GlideApp;
 import com.example.fyp.HomeFragment;
 import com.example.fyp.R;
 import com.example.fyp.UserFolder.User;
@@ -31,17 +33,25 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawer;
     private TextView email,username;
     private ImageView profileImage;
     private FirebaseAuth firebaseAuth;
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
+    private String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        userID = firebaseAuth.getUid();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -70,8 +80,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
 
         //get the current user email and username and display it in the nav header
-        firebaseAuth = FirebaseAuth.getInstance();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users").child(firebaseAuth.getUid());
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users").child(userID);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -80,7 +89,17 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
                     email.setText(user.getEmail());
                     username.setText(user.getUsernname());
 
-                    Glide.with(DrawerActivity.this).load(R.drawable.footprint_solid).into(profileImage);
+                    storage = FirebaseStorage.getInstance();
+                    if(user.getImageID().isEmpty()){
+
+                        GlideApp.with(DrawerActivity.this).load(R.drawable.ic_baseline_person_outline_24).into(profileImage);
+                    }else{
+                        storageReference = FirebaseStorage.getInstance().getReference().child("images").child(user.getImageID());
+
+
+                        GlideApp.with(DrawerActivity.this).load(storageReference).apply(new RequestOptions().override(200, 200)).into(profileImage);
+                    }
+
 
                 }
             }
@@ -89,6 +108,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
             }
         });
+
 
     }
     @Override
@@ -101,23 +121,35 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
     @Override
     public void onBackPressed() {
         //closes nav bar rather than leaving activity when back is pressed with nav bar open
+//        if(drawer.isDrawerOpen(GravityCompat.START)){
+//            drawer.closeDrawer(GravityCompat.START);
+//        }else if(getSupportFragmentManager().findFragmentByTag("fragBack") != null) {
+//
+//        }else if(getSupportFragmentManager().getBackStackEntryCount() != 0){
+//            Fragment fragment = getSupportFragmentManager().findFragmentByTag("fragBack");
+//            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().remove(fragment);
+//            fragmentTransaction.commit();
+//        } else {
+//            super.onBackPressed();
+//            return;
+//        }
         if(drawer.isDrawerOpen(GravityCompat.START)){
             drawer.closeDrawer(GravityCompat.START);
-        }else{
-            //super.onBackPressed();
-        }
-
-        if (getSupportFragmentManager().findFragmentByTag("fragBack") != null) {
-
-        } else {
+        }else {
             super.onBackPressed();
-            return;
         }
-        if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
-            Fragment fragment = getSupportFragmentManager().findFragmentByTag("fragBack");
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().remove(fragment);
-            fragmentTransaction.commit();
-        }
+
+//        if (getSupportFragmentManager().findFragmentByTag("fragBack") != null) {
+//
+//        } else {
+//            super.onBackPressed();
+//            return;
+//        }
+//        if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
+//            Fragment fragment = getSupportFragmentManager().findFragmentByTag("fragBack");
+//            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().remove(fragment);
+//            fragmentTransaction.commit();
+//        }
     }
 
     @Override
