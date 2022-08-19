@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,19 +11,77 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+        <TextView
+            android:id="@+id/totalCO2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.0 Total CO2"
+            android:textSize="30dp"
+            android:layout_gravity="center_horizontal"/>
 
         <com.github.mikephil.charting.charts.PieChart
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:id="@+id/pieChart"
             ></com.github.mikephil.charting.charts.PieChart>
-        <TextView
-            android:id="@+id/totalCO2"
+        <LinearLayout
+            android:id="@+id/pieChartLegend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0.0 Total CO2"
-            android:gravity="center"/>
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:visibility="visible">
 
+            <ImageView
+                android:id="@+id/flightIconPC"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_baseline_flight_24"
+                app:tint="@color/blue_jeans" />
+
+            <TextView
+                android:id="@+id/flightTitlePC"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:text="Flights"
+                android:textStyle="bold"
+                android:textSize="20dp"
+                android:paddingRight="20dp"/>
+
+            <ImageView
+                android:id="@+id/foodIconPC"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_baseline_fastfood_24"
+                app:tint="@color/cyber_yellow" />
+
+            <TextView
+                android:id="@+id/foodTitlePC"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:text="Food"
+                android:textStyle="bold"
+                android:textSize="20dp"
+                android:paddingRight="20dp"
+                android:paddingLeft="4dp"/>
+            <ImageView
+                android:id="@+id/clothingIconPC"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/hanger"
+                app:tint="@color/heat_wave" />
+            <TextView
+                android:id="@+id/clothesTitlePC"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:text="Clothing"
+                android:textStyle="bold"
+                android:textSize="20dp"
+                android:paddingLeft="4dp"/>
+
+
+
+        </LinearLayout>
         <com.github.mikephil.charting.charts.BarChart
             android:layout_width="match_parent"
             android:layout_height="300dp"

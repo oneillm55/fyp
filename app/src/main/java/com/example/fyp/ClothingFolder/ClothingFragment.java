@@ -93,10 +93,9 @@ public class ClothingFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 totalLbs=round(calculateClothesTotal(),2);
-                clothesTotal.setText(String.valueOf(totalLbs+"lbs of CO2"));
-                final String clothingID = UUID.randomUUID().toString();//create a unique id for a flight
+               // clothesTotal.setText(String.valueOf(totalLbs+"lbs of CO2"));
                 Clothing clothing = new Clothing(airDryLbs, secondHandLbs, sustainableLbs, coldWashLbs, returnLbs,totalLbs, airDrySlider.getValue(), secondHandSlider.getValue(), sustainableSlider.getValue(),coldWashSlider.getValue(), returnSlider.getValue(),returnOnlineSlider.getValue());
-                mDatabase.child("clothing").child(userID).child(clothingID).setValue(clothing);
+                mDatabase.child("clothing").child(userID).setValue(clothing);
                 updateUserFootprint(convertPoundToTon(calculateClothesTotal()));
                 Toast.makeText(getContext(), "Clothing data Saved", Toast.LENGTH_SHORT).show();
 
@@ -127,12 +126,12 @@ public class ClothingFragment extends Fragment {
 
     private double calculateClothesTotal() {
 
-        if(airDryEdited) {//check if the user has interacted with the slider
-            airDryLbs =(447-(airDrySlider.getValue()*89.4));//447/5 as it uses 1-5 slider not 1-100
+        if(coldWashEdited) {
+            coldWashLbs =(43-(coldWashSlider.getValue()*.43));//todo fix calculations
         }
 
-        if(coldWashEdited) {
-            coldWashLbs =(43-(coldWashSlider.getValue()*8.6));
+        if(airDryEdited) {//check if the user has interacted with the slider
+            airDryLbs =(447-(airDrySlider.getValue()*4.47));//todo fix calculations
         }
 
         if(secondHandEdited) {
@@ -227,7 +226,7 @@ public class ClothingFragment extends Fragment {
         }
 
         public void updateDisplayTotal(){
-            clothesTotal.setText(String.valueOf(df.format(calculateClothesTotal())+"lbs of CO2"));
+            clothesTotal.setText(String.valueOf(df.format(convertPoundToTon(calculateClothesTotal()))+"Tonnes of CO2"));
         }
 
 

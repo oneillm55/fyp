@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
     public class MyViewHolder extends RecyclerView.ViewHolder{
         private TextView arrive, depart, flightClass, footprint, returnFlight;
         private ImageFilterButton deleteButton;
+        private ImageView arrowImage;
         private FirebaseAuth firebaseAuth;
         private DatabaseReference mDatabase;
 
@@ -52,8 +54,8 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
             depart = itemView.findViewById(R.id.arrive_name);
             flightClass = itemView.findViewById(R.id.flight_class);
             footprint = itemView.findViewById(R.id.flight_footprint);
-            returnFlight = itemView.findViewById(R.id.flight_return);
             deleteButton= itemView.findViewById(R.id.delete_flight);
+            arrowImage=itemView.findViewById(R.id.arrowImage);
         }
     }
 
@@ -70,8 +72,13 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
         holder.arrive.setText(flight.getArrive());
         holder.depart.setText(flight.getDepart());
         holder.flightClass.setText(flight.getFlightClass());
-        holder.footprint.setText(String.valueOf(flight.getFootprint()));
-        holder.returnFlight.setText(String.valueOf(flight.getReturnFlight()));
+        holder.footprint.setText(String.valueOf(flight.getFootprint()+"t CO2"));
+        if(flight.getReturnFlight()){
+            holder.arrowImage.setImageResource(R.drawable.ic_baseline_compare_arrows_24);
+        }else{
+
+            holder.arrowImage.setImageResource(R.drawable.ic_baseline_arrow_forward_24);
+        }
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,11 +91,13 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
                                     public void onClick(DialogInterface dialog, int id) {
                                         //delete flight
                                         holder.mDatabase.child("flights").child(holder.firebaseAuth.getUid()).child(flight.getFlightID()).removeValue();
-                                        flightList.clear();
+                                        notifyDataSetChanged();
+                                        flightList.clear();// clear the flight list so that the same flights arent displayed on reload
                                         //update footprint total
                                         updateUserTotalFootprint(holder.mDatabase,holder.firebaseAuth.getUid(),flight.getFootprint());
+//                                     error this is working to update the database but the total displayed on the flight page doesnt update
+//                                        notifyDataSetChanged();
 
-                                        notifyDataSetChanged();
 
                                     }
                                 })
@@ -100,6 +109,7 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
         });
 
     }
+
 
     @Override
     public int getItemCount() {
@@ -121,6 +131,7 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
                     Footprint footprint = snapshot.getValue(Footprint.class);
                     newFlightFootprint = footprint.getFlight() - d;
                     db.child("footprint").child(uid).child("flight").setValue(newFlightFootprint);
+                    notifyDataSetChanged();
                 }
             }
 

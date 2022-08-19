@@ -1,103 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.emilsjolander.components.StickyScrollViewItems.StickyScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/green_background"
     android:id="@+id/flight_fragment">
 
-
-    <FrameLayout
-        android:id="@+id/flight_fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center">
 
-        <ImageView
-            android:id="@+id/flightIcon"
-            android:layout_width="203dp"
-            android:layout_height="130dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="50dp"
-            android:src="@drawable/ic_baseline_flight_24" />
-        <TextView
-            android:id="@+id/flightFootprint"
-            android:layout_width="300dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:background="@android:color/transparent"
-            android:minHeight="48dp"
-            android:textAlignment="center"
-            android:textColorHint="#F6F6F6" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:tag="sticky"
+            android:background="@drawable/green_background_secondary">
 
-        <AutoCompleteTextView
-            android:id="@+id/autoCompleteDepart"
-            android:layout_width="300dp"
-            android:layout_height="48dp"
-            android:ems="10"
-            android:textColorHint="#F6F6F6"
-            android:minHeight="48dp"
-            android:background="@android:color/transparent"
-            android:hint="Depart From.."
-            android:completionThreshold="1"
-            android:inputType="text"/>
-        <AutoCompleteTextView
-            android:id="@+id/autoCompleteArrive"
-            android:layout_width="300dp"
-            android:layout_height="48dp"
-            android:ems="10"
-            android:textColorHint="#F6F6F6"
-            android:minHeight="48dp"
-            android:background="@android:color/transparent"
-            android:hint="Arrive in.."
-            android:completionThreshold="1"
-            android:inputType="text"/>
+            <ImageView
+                android:id="@+id/foodIcon"
+                android:layout_width="408dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/ic_baseline_flight_24" />
+            <TextView
+                android:id="@+id/flightFootprint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="20dp"
+                android:text="XXXXX"
+                android:gravity="center" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#028A4F"/>
 
-        <Spinner
-            android:id="@+id/return_spinner"
-            android:layout_width="300dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:ems="10"
-            android:minHeight="48dp"
-            android:textAlignment="center"
-            android:textColorHint="#F6F6F6" />
-        <Spinner
-            android:id="@+id/class_spinner"
-            android:layout_width="300dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:ems="10"
-            android:minHeight="48dp"
-            android:textAlignment="center"
-            android:textColorHint="#F6F6F6" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/recyclerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
 
-        <Button
-            android:id="@+id/calculateFlightButton"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="300dp"
-            android:layout_height="62dp"
-            android:layout_marginTop="8dp"
-            android:text="Calculate" />
-        <Button
-            android:id="@+id/saveFlightButton"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="300dp"
-            android:layout_height="62dp"
-            android:layout_marginTop="8dp"
-            android:text="Save Flight"
-            android:visibility="invisible"/>
-        <Button
-            android:id="@+id/viewFlightButton"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="300dp"
-            android:layout_height="62dp"
-            android:layout_marginTop="8dp"
-            android:text="View Flights" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="40dp"
+                android:text="Your Flights"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/flights_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="205dp"/>
+
+        </LinearLayout>
+    <LinearLayout
+        android:id="@+id/addFlightLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        >
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteDepart"
+                android:layout_width="196dp"
+                android:layout_height="48dp"
+                android:ems="10"
+                android:minHeight="48dp"
+                android:background="@android:color/transparent"
+                android:hint="Depart From.."
+                android:completionThreshold="1"
+                android:inputType="text"
+                android:textSize="15dp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_baseline_arrow_forward_24"/>
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteArrive"
+                android:layout_width="196dp"
+                android:layout_height="48dp"
+                android:ems="10"
+                android:minHeight="48dp"
+                android:background="@android:color/transparent"
+                android:hint="Arrive in.."
+                android:completionThreshold="1"
+                android:inputType="text"
+                android:textSize="15dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@android:color/transparent"
+                android:ems="10"
+                android:text="Return?"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:textAlignment="center"/>
+            <Spinner
+                android:id="@+id/return_spinner"
+                android:layout_width="200dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:minHeight="48dp"
+                android:textAlignment="center"
+                android:textColorHint="#F6F6F6" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@android:color/transparent"
+                android:ems="10"
+                android:text="Class:"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:textAlignment="center"/>
+            <Spinner
+                android:id="@+id/class_spinner"
+                android:layout_width="200dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:ems="10"
+                android:minHeight="48dp"
+                android:textAlignment="center"
+                android:textColorHint="#F6F6F6" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/calculateFlightButton"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="200dp"
+                android:layout_height="62dp"
+                android:layout_marginTop="8dp"
+                android:text="Calculate"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"/>
+            <Button
+                android:id="@+id/saveFlightButton"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="200dp"
+                android:layout_height="62dp"
+                android:layout_marginTop="8dp"
+                android:text="Save Flight"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:visibility="invisible"/>
+
+        </LinearLayout>
     </LinearLayout>
-    </FrameLayout>
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/openAddFlightButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="300dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="8dp"
+            android:text="Add a new Flight" />
+    </LinearLayout>
+
+</com.emilsjolander.components.StickyScrollViewItems.StickyScrollView>

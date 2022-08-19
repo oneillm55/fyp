@@ -16,7 +16,7 @@
             android:text="Your Flights"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/flights_recycler_view"
+            android:id="@+id/flights_recycler_view2"
             android:layout_width="match_parent"
             android:layout_height="500dp" />
 

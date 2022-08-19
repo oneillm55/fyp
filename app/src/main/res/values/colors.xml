@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="light_green">#3ca63d</color>
     <color name="dark_green">#355E3B</color>
+    <color name="blue_jeans">#6BB2F1</color>
+    <color name="cyber_yellow">#FFD301</color>
+    <color name="heat_wave">#FF7800</color>
 </resources>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.fyp.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/clothingFragment"
+        android:name="com.example.fyp.ClothingFolder.ClothingFragment"
+        android:label="ClothingFragment"
+        tools:layout="@layout/fragment_clothing"/>
+    <fragment
+        android:id="@+id/flightFragment"
+        android:name="com.example.fyp.FlightFolder.FlightFragment"
+        android:label="FlightFragment"
+        tools:layout="@layout/fragment_flight">
+    </fragment>
+
+    <fragment
+        android:id="@+id/foodFragment"
+        android:name="com.example.fyp.FoodFolder.FoodFragment"
+        android:label="FoodFragment"
+        tools:layout="@layout/fragment_food"/>
+    <fragment
+        android:id="@+id/viewFlightsFragment"
+        android:name="com.example.fyp.FlightFolder.ViewFlightsFragment"
+        android:label="ViewFlightsFragment"
+        tools:layout="@layout/fragment_view_flights"/>
+</navigation>

@@ -1,19 +1,19 @@
 package com.example.fyp.FlightFolder;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SearchView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fyp.Footprint;
 import com.example.fyp.R;
@@ -34,18 +35,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -56,20 +54,56 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
     private TextView flightFootprint;
     private EditText depart, arrival;
-    private Button calculateFlightButton, viewFlightButton, saveFlightButton;
+    private Button calculateFlightButton, addFlightButton, saveFlightButton;
     private FirebaseAuth firebaseAuth;
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabase,fDatabase;
     private FirebaseUser firebaseUser;
     private String userID, classString, returnString;
     private boolean returnFlight, calculationValid;
     private double footprintInTonnes;
     private AutoCompleteTextView autoDepart, autoArrive;
     private String[] airports;
+    private List<Flight> flightList;
+    private RecyclerView recyclerView;
+    private Spinner classSpinner, returnSpinner;
+    private ArrayAdapter<CharSequence> classAdapter, returnAdapter;
+    private LinearLayout addFlightLayout,recyclerLayout;
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_flight, container, false);
+        View view = inflater.inflate(R.layout.fragment_flight, container, false);
+       // flightList = new ArrayList<>();
+        firebaseAuth = FirebaseAuth.getInstance();
+        fDatabase = FirebaseDatabase.getInstance().getReference("flights").child(firebaseAuth.getUid());
+        fDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+               flightList = new ArrayList<>();
+               double total=0;
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Flight flight = dataSnapshot.getValue(Flight.class);
+                    flightList.add(flight);
+                    total+= flight.getFootprint();
+
+                }
+
+                flightFootprint.setText(String.valueOf(df.format(total) ) + " tonnes of CO2");
+                recyclerView = view.findViewById(R.id.flights_recycler_view);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+                recyclerView.setAdapter(new FlightAdapter(view.getContext(), flightList));
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+       // return inflater.inflate(R.layout.fragment_flight, container, false);
+        return view;
 
     }
 
@@ -82,7 +116,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         autoArrive = view.findViewById(R.id.autoCompleteArrive);
         autoDepart = view.findViewById(R.id.autoCompleteDepart);
         calculateFlightButton = view.findViewById(R.id.calculateFlightButton);
-        viewFlightButton = view.findViewById(R.id.viewFlightButton);
+        addFlightButton = view.findViewById(R.id.openAddFlightButton);
         saveFlightButton = view.findViewById(R.id.saveFlightButton);
         flightFootprint = view.findViewById(R.id.flightFootprint);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -91,15 +125,21 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         mDatabase = FirebaseDatabase.getInstance().getReference();
         calculationValid = false;
         airports = getResources().getStringArray(R.array.airports);
+        addFlightLayout= view.findViewById(R.id.addFlightLayout);
+        recyclerLayout= view.findViewById(R.id.recyclerLayout);
 
-        Spinner classSpinner = view.findViewById(R.id.class_spinner);
-        ArrayAdapter<CharSequence> classAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.class_spinner_options, android.R.layout.simple_spinner_item);
+        userHasFlights();//check if the user has any flights saved before setting the recyclerview visible
+
+        setTotalFootprint();
+
+        classSpinner = view.findViewById(R.id.class_spinner);
+        classAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.class_spinner_options, android.R.layout.simple_spinner_item);
         classAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         classSpinner.setAdapter(classAdapter);
         classSpinner.setOnItemSelectedListener(this);
 
-        Spinner returnSpinner = view.findViewById(R.id.return_spinner);
-        ArrayAdapter<CharSequence> returnAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.yes_no_spinner_options, android.R.layout.simple_spinner_item);
+        returnSpinner = view.findViewById(R.id.return_spinner);
+        returnAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.yes_no_spinner_options, android.R.layout.simple_spinner_item);
         returnAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         returnSpinner.setAdapter(returnAdapter);
         returnSpinner.setOnItemSelectedListener(this);
@@ -107,6 +147,19 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         ArrayAdapter<String> airportAdapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_list_item_1, airports);
         autoArrive.setAdapter(airportAdapter);
         autoDepart.setAdapter(airportAdapter);
+
+
+        AutoCompleteTextView.OnDismissListener dismissListener = new AutoCompleteTextView.OnDismissListener() {// closes the keyboard after an option has been selected from the drop down
+            @Override
+            public void onDismiss() {
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        };
+        autoDepart.setOnDismissListener(dismissListener);
+        autoArrive.setOnDismissListener(dismissListener);
+
+
 
         calculateFlightButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -154,7 +207,8 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                                         footprintInTonnes = footprintInTonnes * 2;
                                     }
 
-                                    flightFootprint.setText(String.valueOf(footprintInTonnes) + " tonnes of CO2");
+                                   //
+                                    // flightFootprint.setText(String.valueOf(footprintInTonnes) + " tonnes of CO2");
                                     getActivity().runOnUiThread(new Runnable() { // used to access ui thread so view can be updated
 
                                         @Override
@@ -192,10 +246,11 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
         });
 
-        viewFlightButton.setOnClickListener(new View.OnClickListener() {
+        addFlightButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getParentFragmentManager().beginTransaction().add(R.id.flight_fragment_container, new ViewFlightsFragment()).addToBackStack("fragBack").commit();
+              addFlightLayout.setVisibility(View.VISIBLE);
+              addFlightButton.setVisibility(View.GONE);
             }
         });
 
@@ -205,10 +260,17 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                 //add check to make sure a flight has been calculated
                 if(calculationValid){
                     final String flightID = UUID.randomUUID().toString();//create a unique id for a flight
-                   Flight flight = new Flight(autoDepart.getText().toString().trim(), autoArrive.getText().toString().trim(), classSpinner.getSelectedItem().toString(), flightID, footprintInTonnes, getReturnFlight());
+                    Flight flight = new Flight(autoDepart.getText().toString().trim(), autoArrive.getText().toString().trim(), classSpinner.getSelectedItem().toString(), flightID, footprintInTonnes, getReturnFlight());
                     mDatabase.child("flights").child(firebaseAuth.getUid()).child(flightID).setValue(flight);
                     updateUserTotalFootprint(flight.getFootprint());
                     Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
+                    addFlightLayout.setVisibility(View.GONE);
+                    addFlightButton.setVisibility(View.VISIBLE);
+                    userHasFlights();
+                    calculationValid=false;
+                    //reset autocompletes
+                    autoDepart.setText("");
+                    autoArrive.setText("");
                 }else{
                     Toast.makeText(getContext(), "Please calculate a flight first", Toast.LENGTH_SHORT).show();
                 }
@@ -216,6 +278,25 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
             }
         });
 
+    }
+
+    private void userHasFlights() {
+        FirebaseDatabase.getInstance().getReference("flights").child(firebaseAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    //check theres a flight in the database
+                    if(snapshot.hasChildren()){
+                      //  if so set recyclerview to be visible
+                        recyclerLayout.setVisibility(View.VISIBLE);
+
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
     }
 
     private boolean validAirport(String s) {
@@ -242,6 +323,24 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                     Footprint footprint = snapshot.getValue(Footprint.class);
                     newFlightFootprint = footprint.getFlight() + d;
                     mDatabase.child("footprint").child(firebaseAuth.getUid()).child("flight").setValue(newFlightFootprint);
+                    flightFootprint.setText(String.valueOf(df.format(newFlightFootprint) ) + " tonnes of CO2");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void setTotalFootprint() {
+        mDatabase.child("footprint").child(firebaseAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if (snapshot.exists()) {
+                    Footprint footprint = snapshot.getValue(Footprint.class);
+                    flightFootprint.setText(String.valueOf(df.format(footprint.getFlight())) + " tonnes of CO2");
                 }
             }
 
@@ -302,6 +401,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
 
 
 }

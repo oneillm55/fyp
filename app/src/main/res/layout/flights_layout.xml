@@ -8,114 +8,98 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/notecard"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:elevation="5dp"
-        app:cardCornerRadius="5dp"
+        app:cardBackgroundColor="@color/blue_jeans"
         app:cardMaxElevation="5dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/flight_linear_layout"
-        android:orientation="horizontal">
         <LinearLayout
+            android:id="@+id/flightLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:weightSum="7">
-        <TextView
-            android:id="@+id/depart_name"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="1dp"
-            android:paddingTop="1dp"
-            android:paddingRight="0dp"
-            android:paddingBottom="2dp"
-            android:text="depart"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:layout_weight="1"></TextView>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_arrow_forward_24"
-            android:layout_weight="1"/>
-
-        <TextView
-            android:id="@+id/arrive_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="0dp"
-            android:paddingTop="1dp"
-            android:paddingRight="0dp"
-            android:paddingBottom="2dp"
-            android:text="arrive"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:layout_weight="1"></TextView>
-
-        <TextView
-            android:id="@+id/flight_footprint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="0dp"
-            android:paddingTop="1dp"
-            android:paddingRight="1dp"
-            android:paddingBottom="2dp"
-            android:text="footprint"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold"></TextView>
-
-        <TextView
-            android:id="@+id/flight_return"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="0dp"
-            android:paddingTop="1dp"
-            android:paddingRight="1dp"
-            android:paddingBottom="2dp"
-            android:text="return"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:layout_weight="1"></TextView>
-        <TextView
-            android:id="@+id/flight_class"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingLeft="0dp"
-            android:paddingTop="1dp"
-            android:paddingRight="1dp"
-            android:paddingBottom="2dp"
-            android:text="class"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:layout_weight="1"></TextView>/>
+            android:orientation="vertical">
 
 
-            <androidx.constraintlayout.utils.widget.ImageFilterButton
-                android:id="@+id/delete_flight"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:background="@color/white"
-                android:minWidth="32dp"
-                android:minHeight="32dp"
-                android:src="@drawable/ic_baseline_delete_24"
-                tools:ignore="SpeakableTextPresentCheck"
-                >
+            <LinearLayout
+                android:id="@+id/departArriveLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/depart_name"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:text="depart"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"></TextView>
 
-            </androidx.constraintlayout.utils.widget.ImageFilterButton>
+                <ImageView
+                    android:id="@+id/arrowImage"
+                    android:layout_width="8dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_baseline_arrow_forward_24" />
+
+                <TextView
+                    android:id="@+id/arrive_name"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:text="arrive"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"></TextView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/valuesLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/flight_footprint"
+                    android:layout_width="136dp"
+                    android:layout_height="match_parent"
+                    android:text="Footprint"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:paddingLeft="20dp"></TextView>
+
+                <TextView
+                    android:layout_width="17dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Class:"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:paddingLeft="17dp"></TextView>
+
+                <TextView
+                    android:id="@+id/flight_class"
+                    android:layout_width="96dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="class"
+                    android:textSize="15sp"
+                    android:textStyle="bold"></TextView>
+
+                <androidx.constraintlayout.utils.widget.ImageFilterButton
+                    android:id="@+id/delete_flight"
+                    android:layout_width="57dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:minWidth="32dp"
+                    android:minHeight="32dp"
+                    android:src="@drawable/ic_baseline_delete_24"
+                    tools:ignore="SpeakableTextPresentCheck" />
+            </LinearLayout>
         </LinearLayout>
 
-
-    </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
