@@ -47,6 +47,7 @@ public class SignupActivity extends AppCompatActivity {
         //getSupportActionBar().setTitle("");
 
         firebaseAuth = FirebaseAuth.getInstance();
+        //userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -85,14 +86,14 @@ public class SignupActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
 
                             if(task.isSuccessful()){
-                                Toast.makeText(getApplicationContext(), "Registration Complete", Toast.LENGTH_SHORT).show();
 
                                 //realtime
-                                 User user = new User(busername,bemail,bpassword,null);
+                                 User user = new User(busername,bemail,bpassword," ");
 
-                                 mDatabase.child("users").child(userID).setValue(user);
+                                 mDatabase.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user);
 
 
+                                Toast.makeText(getApplicationContext(), "Registration Complete", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(SignupActivity.this,MainActivity.class));
 
                             }else{

@@ -68,7 +68,7 @@ public class ClothingFragment extends Fragment {
         returnOnlineTextView= view.findViewById(R.id.returnOnlineTextView);
         buyingTextView = view.findViewById(R.id.buyingTextView);
         airDryTextView = view.findViewById(R.id.airDryTextView);
-        totalLayout = view.findViewById(R.id.totalFlightLayout);
+        totalLayout = view.findViewById(R.id.totalClothingLayout);
 
 
         userID = FirebaseAuth.getInstance().getCurrentUser().getUid();

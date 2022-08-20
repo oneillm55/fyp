@@ -40,7 +40,7 @@ public class UserFragment extends Fragment {
    // Intent userData;
    public static final int REQUEST_CODE = 11;
     public static final int RESULT_CODE = 12;
-    TextView userEmail,username;
+    TextView userEmail,username, editPictureText;
     FirebaseAuth firebaseAuth;
     DatabaseReference mDatabase;
     FirebaseUser firebaseUser;
@@ -62,6 +62,7 @@ public class UserFragment extends Fragment {
         logoutButton = view.findViewById(R.id.logoutButton);
         saveButton = view.findViewById(R.id.saveButton);
         profileImage = view.findViewById(R.id.userProfilePicture);
+        editPictureText = view.findViewById(R.id.editPictureText);
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getUid();
 
@@ -84,7 +85,9 @@ public class UserFragment extends Fragment {
                         return;
                     }
 
-                    if(user.getImageID().isEmpty()){
+
+
+                    if(user.getImageID().equalsIgnoreCase(" ")){
 
                         GlideApp.with(getActivity()).load(R.drawable.ic_baseline_person_outline_24).apply(new RequestOptions().override(200, 200)).into(profileImage);
                     }else {
@@ -113,6 +116,7 @@ public class UserFragment extends Fragment {
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 chooseImage();
 
 
@@ -124,6 +128,7 @@ public class UserFragment extends Fragment {
             public void onClick(View view) {
                 uploadImage();
                 saveButton.setVisibility(View.GONE);
+                editPictureText.setVisibility(View.VISIBLE);
 
             }
         });
@@ -148,6 +153,7 @@ public class UserFragment extends Fragment {
             imageUri = data.getData();
             profileImage.setImageURI(imageUri);
             saveButton.setVisibility(View.VISIBLE);
+            editPictureText.setVisibility(View.GONE);
 
         }
     }

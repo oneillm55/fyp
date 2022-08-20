@@ -90,7 +90,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
                     username.setText(user.getUsernname());
 
                     storage = FirebaseStorage.getInstance();
-                    if(user.getImageID().isEmpty()){
+                    if(user.getImageID().equalsIgnoreCase(" ")){
 
                         GlideApp.with(DrawerActivity.this).load(R.drawable.ic_baseline_person_outline_24).into(profileImage);
                     }else{
