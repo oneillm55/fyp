@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,7 +30,7 @@ import java.text.DecimalFormat;
 
 public class FoodFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
-    private String meatString,dairyString, compostString, organicString,shoppingString;
+    private String meatString="",dairyString="", compostString="", organicString="",shoppingString="";
     private TextView displayTextView,meatTextView,dairyTextView, compostTextView, organicTextView,shoppingTextView;
     private Spinner meatSpinner,dairySpinner, compostSpinner, organicSpinner,shoppingSpinner;
     private double foodValue, meatValue,dairyValue, compostValue, organicValue,shoppingValue;
@@ -37,6 +38,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
     private DatabaseReference mDatabase;
     private String userID;
     private Button calculateButton;
+    private LinearLayout totalLayout;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
 
@@ -60,6 +62,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
         compostTextView= view.findViewById(R.id.editTextCompost);
         organicTextView= view.findViewById(R.id.editTextOrganic);
         shoppingTextView= view.findViewById(R.id.editTextCompost);
+        totalLayout = view.findViewById((R.id.totalFoodLayout));
 
         meatSpinner = view.findViewById(R.id.meat_spinner);
         ArrayAdapter<CharSequence> meatAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.meat_spinner_options, android.R.layout.simple_spinner_item);
@@ -87,7 +90,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
         shoppingSpinner = view.findViewById(R.id.shopping_spinner);
         ArrayAdapter<CharSequence> shoppingAdapter = ArrayAdapter.createFromResource(this.getContext(), R.array.shopping_spinner_options, android.R.layout.simple_spinner_item);
-        shoppingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        shoppingAdapter.setDropDownViewResource(R.layout.custom_spinner);
         shoppingSpinner.setAdapter(shoppingAdapter);
         shoppingSpinner.setOnItemSelectedListener(this);
 
@@ -113,27 +116,22 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
         switch(adapterView.getId()){
             case R.id.meat_spinner:
                 meatString = adapterView.getItemAtPosition(i).toString();
-                dairyTextView.setVisibility(View.VISIBLE);//not working as the spinners are automatically selected on create
-                dairySpinner.setVisibility(View.VISIBLE);
+                updateDisplay();
                 break;
             case R.id.dairy_spinner:
                 dairyString = adapterView.getItemAtPosition(i).toString();
-                compostTextView.setVisibility(View.VISIBLE);
-                compostSpinner.setVisibility(View.VISIBLE);
+                updateDisplay();
                 break;
             case R.id.compost_spinner:
                 compostString = adapterView.getItemAtPosition(i).toString();
-                organicTextView.setVisibility(View.VISIBLE);
-                organicSpinner.setVisibility(View.VISIBLE);
+                updateDisplay();
                 break;
             case R.id.organic_spinner:
                 organicString = adapterView.getItemAtPosition(i).toString();
-                shoppingTextView.setVisibility(View.VISIBLE);
-                shoppingSpinner.setVisibility(View.VISIBLE);
+                updateDisplay();
                 break;
             case R.id.shopping_spinner:
-                shoppingString = adapterView.getItemAtPosition(i).toString();
-                calculateButton.setVisibility(View.VISIBLE);
+                updateDisplay();
                 break;
         }
        // getFoodCO2();
@@ -164,6 +162,8 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
         double value = 0;
         switch (meatString) {
+            case"":
+                break;
             case "Never":
                 break;
             case "Occasionally":
@@ -184,6 +184,8 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
         double value = 0;
         switch(dairyString) {
+            case"":
+                break;
             case "Never":
                 break;
             case "Occasionally":
@@ -202,6 +204,8 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
         double value = 0;
         switch(compostString) {
+            case"":
+                break;
             case "Yes":
                 break;
             case "No":
@@ -216,6 +220,8 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
         double value = 0;
         switch(shoppingString) {
+            case"":
+                break;
             case "Only local produce":
                 value = value + .03;//to do find accurate number
                 break;
@@ -237,6 +243,8 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
         double value = 0;
         switch(organicString) {
+            case"":
+                break;
             case "None":
                 value = value + .06;
                 break;
@@ -253,6 +261,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
 
     public void updateDisplay(){
+        totalLayout.setVisibility(View.VISIBLE);
         foodValue=round(getFoodCO2(),2);
         displayTextView.setText( foodValue  + " Tonnes of CO2");
     };

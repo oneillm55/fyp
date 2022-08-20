@@ -12,5 +12,11 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="android:dropDownListViewStyle">@style/MySpinner</item>
+    </style>
+
+    <style name="MySpinner" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:dividerHeight">2dp</item>
+        <item name="android:divider">#808080</item>
     </style>
 </resources>

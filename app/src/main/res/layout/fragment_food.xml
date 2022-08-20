@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/green_background"
-    android:fadeScrollbars="false">
+    android:fadeScrollbars="false"
+    android:background="@drawable/green_background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,21 +23,36 @@
                 android:layout_width="408dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:src="@drawable/ic_baseline_fastfood_24" />
-        <TextView
-            android:id="@+id/textViewDisplay"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="20dp"
-            android:text="XXXXX"
-            android:gravity="center" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="#028A4F"/>
+            <LinearLayout
+                android:id="@+id/totalFoodLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:visibility="gone">
 
+                <TextView
+                    android:id="@+id/textViewDisplay"
+                    android:layout_width="290dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="20dp"
+                    android:textAlignment="center"/>
+
+                <ImageView
+                    android:id="@+id/foodSourceImage"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/friends_of_earth"
+                    android:paddingLeft="8dp"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#028A4F"/>
     </LinearLayout>
     <TextView
         android:id="@+id/editTextMeat"
@@ -47,99 +62,91 @@
         android:background="@android:color/transparent"
         android:ems="10"
         android:text="How many times a week do you consume meat?"
-        android:inputType="text"
         android:minHeight="48dp"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="20dp"/>
 
     <Spinner
         android:id="@+id/meat_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:ems="10"
         android:minHeight="48dp"
-        android:textAlignment="center" />
+        />
     <TextView
         android:id="@+id/editTextDairy"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:ems="10"
         android:text="How often do you consume dairy / eggs?"
-        android:inputType="text"
         android:minHeight="48dp"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="20dp"/>
 
     <Spinner
         android:id="@+id/dairy_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:ems="10"
-        android:minHeight="48dp"
-        android:textAlignment="center"/>
+        android:minHeight="48dp" />
     <TextView
         android:id="@+id/editTextOrganic"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:ems="10"
         android:text="How much of your food is organic?"
-        android:inputType="text"
         android:minHeight="48dp"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="20dp"/>
 
     <Spinner
         android:id="@+id/organic_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:ems="10"
-        android:minHeight="48dp"
-        android:textAlignment="center"/>
+        android:minHeight="48dp"/>
     <TextView
         android:id="@+id/editTextCompost"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:ems="10"
         android:text="Do you compost your food waste?"
-        android:inputType="text"
         android:minHeight="48dp"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="20dp"/>
 
     <Spinner
         android:id="@+id/compost_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:ems="10"
-        android:minHeight="48dp"
-        android:textAlignment="center"/>
+        android:minHeight="48dp"/>
 
     <TextView
         android:id="@+id/editTextShopping"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
         android:ems="10"
         android:text="Which best describes your shopping habits?"
-        android:inputType="text"
         android:minHeight="48dp"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="20dp"/>
 
     <Spinner
         android:id="@+id/shopping_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:ems="10"
-        android:minHeight="48dp"
-        android:textAlignment="center"/>
+        android:minHeight="48dp"/>
 
 
     <Button
@@ -147,8 +154,8 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Calculate"/>
+        android:text="Calculate"
+        android:minHeight="60dp"/>
 
 </LinearLayout>
 

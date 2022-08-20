@@ -19,20 +19,38 @@
             android:background="@drawable/green_background_secondary">
 
             <ImageView
-                android:id="@+id/foodIcon"
+                android:id="@+id/flightIcon"
                 android:layout_width="408dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:src="@drawable/ic_baseline_flight_24" />
-            <TextView
-                android:id="@+id/flightFootprint"
+
+            <LinearLayout
+                android:id="@+id/totalFlightLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="20dp"
-                android:text="XXXXX"
-                android:gravity="center" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/flightFootprint"
+                    android:layout_width="320dp"
+                    android:layout_height="wrap_content"
+                    android:text="XXXXX"
+                    android:textColor="@color/black"
+                    android:textSize="20dp"
+                    android:textAlignment="center"/>
+
+                <ImageView
+                    android:id="@+id/flightSourceImage"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/go_climate"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="8dp"/>
+            </LinearLayout>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="2dp"

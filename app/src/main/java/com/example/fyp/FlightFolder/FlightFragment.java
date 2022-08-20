@@ -67,7 +67,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
     private RecyclerView recyclerView;
     private Spinner classSpinner, returnSpinner;
     private ArrayAdapter<CharSequence> classAdapter, returnAdapter;
-    private LinearLayout addFlightLayout,recyclerLayout;
+    private LinearLayout addFlightLayout,recyclerLayout,totalLayout;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     @Nullable
@@ -127,6 +127,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         airports = getResources().getStringArray(R.array.airports);
         addFlightLayout= view.findViewById(R.id.addFlightLayout);
         recyclerLayout= view.findViewById(R.id.recyclerLayout);
+       totalLayout= view.findViewById(R.id.totalFlightLayout);
 
         userHasFlights();//check if the user has any flights saved before setting the recyclerview visible
 
@@ -290,6 +291,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                       //  if so set recyclerview to be visible
                         recyclerLayout.setVisibility(View.VISIBLE);
 
+
                     }
                 }
             }
@@ -323,6 +325,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                     Footprint footprint = snapshot.getValue(Footprint.class);
                     newFlightFootprint = footprint.getFlight() + d;
                     mDatabase.child("footprint").child(firebaseAuth.getUid()).child("flight").setValue(newFlightFootprint);
+                    totalLayout.setVisibility(View.VISIBLE);
                     flightFootprint.setText(String.valueOf(df.format(newFlightFootprint) ) + " tonnes of CO2");
                 }
             }
@@ -340,6 +343,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
                 if (snapshot.exists()) {
                     Footprint footprint = snapshot.getValue(Footprint.class);
+                    totalLayout.setVisibility(View.VISIBLE);
                     flightFootprint.setText(String.valueOf(df.format(footprint.getFlight())) + " tonnes of CO2");
                 }
             }

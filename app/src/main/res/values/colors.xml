@@ -11,5 +11,7 @@
     <color name="dark_green">#355E3B</color>
     <color name="blue_jeans">#6BB2F1</color>
     <color name="cyber_yellow">#FFD301</color>
-    <color name="heat_wave">#FF7800</color>
+    <color name="heat_wave">#FF7800</color>#939393
+    <color name="grey_1">#D2D2D2</color>
+    <color name="grey_2">#939393</color>
 </resources>

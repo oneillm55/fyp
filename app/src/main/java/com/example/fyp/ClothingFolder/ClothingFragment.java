@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +39,7 @@ public class ClothingFragment extends Fragment {
     private DatabaseReference mDatabase;
     private FirebaseUser firebaseUser;
     private String userID;
-
+    private LinearLayout totalLayout;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     @Nullable
@@ -67,6 +68,7 @@ public class ClothingFragment extends Fragment {
         returnOnlineTextView= view.findViewById(R.id.returnOnlineTextView);
         buyingTextView = view.findViewById(R.id.buyingTextView);
         airDryTextView = view.findViewById(R.id.airDryTextView);
+        totalLayout = view.findViewById(R.id.totalFlightLayout);
 
 
         userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -180,6 +182,7 @@ public class ClothingFragment extends Fragment {
                     coldWashEdited=true;
                         airDryTextView.setVisibility(View.VISIBLE);
                         airDrySlider.setVisibility(View.VISIBLE);
+                        totalLayout.setVisibility(View.VISIBLE);
                     updateDisplayTotal();
                 break;
                 case 2:
