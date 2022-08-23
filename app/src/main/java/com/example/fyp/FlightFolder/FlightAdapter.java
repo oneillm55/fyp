@@ -25,6 +25,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHolder>{
@@ -82,7 +84,7 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "Delete Flight Clicked", Toast.LENGTH_SHORT).show();
+
                 new AlertDialog.Builder(view.getContext())
                                 .setTitle("Delete Flight")
                                 .setMessage("Are you sure you want to delete this flight?")
@@ -90,7 +92,7 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         //delete flight
-                                        holder.mDatabase.child("flights").child(holder.firebaseAuth.getUid()).child(flight.getFlightID()).removeValue();
+                                        holder.mDatabase.child(holder.firebaseAuth.getUid()).child("flights").child(flight.getFlightID()).removeValue();
                                         notifyDataSetChanged();
                                         flightList.clear();// clear the flight list so that the same flights arent displayed on reload
                                         //update footprint total
@@ -121,7 +123,7 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
     }
 
     private void updateUserTotalFootprint(DatabaseReference db,String uid, double d) {
-        db.child("footprint").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+        db.child(uid).child("footprint").addListenerForSingleValueEvent(new ValueEventListener() {
             double newFlightFootprint;
 
             @Override
@@ -130,7 +132,7 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
                 if (snapshot.exists()) {
                     Footprint footprint = snapshot.getValue(Footprint.class);
                     newFlightFootprint = footprint.getFlight() - d;
-                    db.child("footprint").child(uid).child("flight").setValue(newFlightFootprint);
+                    db.child(uid).child("footprint").child("flight").setValue(round(newFlightFootprint,2));
                     notifyDataSetChanged();
                 }
             }
@@ -139,6 +141,14 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
+    }
+
+    public double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
 }

@@ -57,26 +57,7 @@
                 android:background="#028A4F"/>
 
         </LinearLayout>
-        <LinearLayout
-            android:id="@+id/recyclerLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:visibility="gone">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="40dp"
-                android:text="Your Flights"/>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/flights_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="205dp"/>
-
-        </LinearLayout>
     <LinearLayout
         android:id="@+id/addFlightLayout"
         android:layout_width="match_parent"
@@ -84,9 +65,6 @@
         android:orientation="vertical"
         android:visibility="gone"
         >
-
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -172,24 +150,11 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <Button
-                android:id="@+id/calculateFlightButton"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="200dp"
-                android:layout_height="62dp"
-                android:layout_marginTop="8dp"
-                android:text="Calculate"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp"/>
-            <Button
                 android:id="@+id/saveFlightButton"
                 style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="200dp"
+                android:layout_width="match_parent"
                 android:layout_height="62dp"
-                android:layout_marginTop="8dp"
-                android:text="Save Flight"
-                android:paddingLeft="30dp"
-                android:paddingRight="30dp"
-                android:visibility="invisible"/>
+                android:text="Save Flight"/>
 
         </LinearLayout>
     </LinearLayout>
@@ -201,6 +166,29 @@
             android:layout_height="62dp"
             android:layout_marginTop="8dp"
             android:text="Add a new Flight" />
+        <LinearLayout
+            android:id="@+id/recyclerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="40dp"
+                android:text="Your Flights"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/flights_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical"
+                android:scrollbarThumbVertical="@color/teal_700"
+                android:scrollbarSize="5dp"/>
+
+        </LinearLayout>
     </LinearLayout>
 
 </com.emilsjolander.components.StickyScrollViewItems.StickyScrollView>

@@ -1,5 +1,7 @@
 package com.example.fyp;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -15,7 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.fyp.UserFolder.User;
+import com.example.fyp.ClothingFolder.Clothing;
+import com.example.fyp.FlightFolder.Flight;
+import com.example.fyp.FoodFolder.Food;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -31,7 +35,6 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,20 +43,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-
-
-
+import java.util.List;
 
 public class HomeFragment extends Fragment implements OnChartValueSelectedListener {
     private PieChart pieChart;
     private BarChart barChart;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mDatabase;
-    private double foodCO2,flightCO2,clothingCO2,totalCO2;
-    private TextView totalCO2TextView;
-    private LinearLayout pieChartLegendLayout;
+    private  double foodCO2,flightCO2,clothingCO2,totalCO2;
+    private TextView totalCO2TextView, recTitle,recParagraph, barChartTitle;
+    private LinearLayout pieChartLayout, barChartLayout,recLayout,big3Layout;
     private boolean userHasData;
     private ArrayList<Integer> colors;
+    Footprint userFootprint = new Footprint();
+    Clothing userClothing;
+    Food userFood;
+    private List<Flight> userFlightList;
+    private String userID;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -63,40 +69,57 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // colors array has to be done in on create as it uses gerResources()
+        // colors array has to be done in on create as it uses getResources()
         colors = new ArrayList<>();
         colors.add(getResources().getColor(R.color.blue_jeans));
         colors.add(getResources().getColor(R.color.cyber_yellow));
         colors.add(getResources().getColor(R.color.heat_wave));
         firebaseAuth = FirebaseAuth.getInstance();
-        mDatabase = FirebaseDatabase.getInstance().getReference("footprint").child(firebaseAuth.getUid());
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        userID=firebaseAuth.getCurrentUser().getUid();
+        mDatabase= FirebaseDatabase.getInstance().getReference();
+
+        readData(new FirebaseCallback() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    //load the page for a user that has carried out the data input
-                    userHasData=true;
-                    Footprint footprint = snapshot.getValue(Footprint.class);
-                    flightCO2=footprint.getFlight();
-                    clothingCO2=footprint.getClothing();
-                    foodCO2=footprint.getFood();
-                    totalCO2=foodCO2+flightCO2+clothingCO2;
-                    setUpPieChart();
-                    loadPieChartData();
-                    setUpBarChart();
-                    loadBarChartData();
-                    // biggest emitter
-                    //barchart for each of 3
-                    totalCO2TextView.setText("Annual CO2 output:\n"+String.format("%.2f", totalCO2)+" Tonnes");
+            public void onCallBack(Clothing clothing) {
+                // error is here user clothing is
+                userClothing = clothing;
+                setBig3(clothing.getAirDryLbs());
+            }
+
+
+            @Override
+            public void onCallBack(Footprint footprint) {
+                userFootprint=footprint;
+                if(footprint.getFlight()!=0){//add check that user has values assigned to it
+                ////                      load user specific views
+                        userHasData=true;
+                        flightCO2=footprint.getFlight();
+                        clothingCO2=footprint.getClothing();
+                        foodCO2=footprint.getFood();
+                        totalCO2=foodCO2+flightCO2+clothingCO2;
+                        totalCO2TextView.setText("Annual CO2 output:\n"+String.format("%.2f", totalCO2)+" Tonnes");
+                        setUpPieChart();
+                        loadPieChartData();
                 }else {
                     //load basic home page
                 }
+                        setUpBarChart();//bar chart always called as it has its own functionality for handling user with or without data
+                        loadBarChartData();
             }
-            @Override
-            public void onCancelled (@NonNull DatabaseError error){
 
+            @Override
+            public void onCallBack(List<Flight> flightList) {
+                    userFlightList= flightList;
             }
+
+            @Override
+            public void onCallBack(Food food) {
+                    userFood=food;
+            }
+
         });
+
+      //  setUserFootprint();
         return inflater.inflate(R.layout.fragment_home, container, false);
 
 
@@ -106,18 +129,149 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         //load generic home page
-        pieChart = view.findViewById(R.id.pieChart);
-        pieChartLegendLayout = view.findViewById(R.id.pieChartLegend);
-        totalCO2TextView = view.findViewById(R.id.totalCO2);
-        barChart = view.findViewById(R.id.barChart);
 
-//        setUpPieChart();
-//        loadPieChartData();
-//        setUpBarChart();
-//        loadBarChartData();
+        totalCO2TextView = view.findViewById(R.id.totalCO2);
+        pieChart = view.findViewById(R.id.pieChart);
+        pieChartLayout = view.findViewById(R.id.pieChartLayout);
+        barChart = view.findViewById(R.id.barChart);
+        barChartTitle= view.findViewById(R.id.barChartTitle);
+        barChartLayout = view.findViewById(R.id.barChartLayout);
+        recLayout = view.findViewById(R.id.recommendationLayout);
+        recTitle= view.findViewById(R.id.recommendationTitle);
+        recParagraph=view.findViewById(R.id.recommendationParagraph);
+        big3Layout = view.findViewById(R.id.big3Layout);
+
+        Log.i("!!!!!", String.valueOf(userFootprint.getFlight()));
+     //get user data
     }
 
+    public void setUserFootprint(){
+        mDatabase.child("footprint").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {//check that user has a flight/ food / clothing footprint value
+                    Footprint footprint = snapshot.getValue(Footprint.class);
+                    userFootprint =footprint;
+                }
+
+            }
+            @Override
+            public void onCancelled (@NonNull DatabaseError error){
+                Toast.makeText(getContext(), "Db error", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
+    private void readData(FirebaseCallback firebaseCallback){
+
+        mDatabase.child(userID).child("footprint").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {//check that user has a flight/ food / clothing footprint value
+                    Footprint footprint = snapshot.getValue(Footprint.class);
+                    firebaseCallback.onCallBack(footprint);
+                }
+
+            }
+            @Override
+            public void onCancelled (@NonNull DatabaseError error){
+                //Toast.makeText(getContext(), "Db error", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        mDatabase.child(userID).child("clothing").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Clothing clothing = snapshot.getValue(Clothing.class);
+                    //do whats required with user clothing
+                    Log.i("in clothing", String.valueOf(clothing.getAirDryLbs()));
+
+                    Toast.makeText(getContext(), "in clothing"+String.valueOf(clothing.getAirDryLbs()), Toast.LENGTH_SHORT).show();
+                    firebaseCallback.onCallBack(clothing);
+                }else{
+                    Log.i("in clothing","Doesnt exist");
+                }
+            }
+            @Override
+            public void onCancelled (@NonNull DatabaseError error){
+
+            }
+        });
+
+        mDatabase.child(userID).child("food").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Food food = snapshot.getValue(Food.class);
+                    //do whats required with user food
+                    firebaseCallback.onCallBack(food);
+                }
+            }
+            @Override
+            public void onCancelled (@NonNull DatabaseError error){
+
+            }
+        });
+
+        mDatabase.child(userID).child("flights").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    List<Flight> flightList = new ArrayList<>();
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Flight flight = dataSnapshot.getValue(Flight.class);
+                        flightList.add(flight);
+                        //do whats required with user flights
+                    }
+                    firebaseCallback.onCallBack(flightList);
+                }
+            }
+            @Override
+            public void onCancelled (@NonNull DatabaseError error){
+
+            }
+        });
+
+
+    };
+
+    private interface FirebaseCallback{
+       void onCallBack(Footprint footprint);
+        void onCallBack(Clothing clothing);
+        void onCallBack(List<Flight> flightList);
+        void onCallBack(Food food);
+    }
+
+    private void setBig3(double d) {
+        //go to the database, find the 3 biggest culprits for users footprint, set the big three to be those 3 in order of tonnes of co2 saved
+        Toast.makeText(getContext(), "d"+String.valueOf(d), Toast.LENGTH_SHORT).show();
+
+    }
+    private void handleFood() {
+        FirebaseDatabase.getInstance().getReference("food").child(firebaseAuth.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Food food = snapshot.getValue(Food.class);
+                    //do whats required with user food
+
+                }
+            }
+            @Override
+            public void onCancelled (@NonNull DatabaseError error){
+
+            }
+        });
+    }
+
+
+
+
     private void setUpBarChart() {
+        barChartLayout.setVisibility(View.VISIBLE);
         barChart.getDescription().setEnabled(false);
         barChart.setFitBars(true);
         barChart.setDrawBorders(false);
@@ -139,10 +293,11 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         ArrayList<Integer> colors = new ArrayList<>();
 
 //        if(userHasData){//load bar chart data relevant to user
-        if(true){
+        if(userHasData){
             labels.add("You");
             entries.add(new BarEntry(0, (float) totalCO2));
             colors.add(Color.rgb(26, 201, 53));
+            barChartTitle.setText("You vs Rest of World");
         }
 
         labels.add("Ireland");
@@ -181,7 +336,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
 
     public void setUpPieChart(){
-        pieChartLegendLayout.setVisibility(View.VISIBLE);
+        pieChartLayout.setVisibility(View.VISIBLE);
         pieChart.setDrawHoleEnabled(true);
         pieChart.setUsePercentValues(true);
         pieChart.setEntryLabelTextSize(12);
@@ -224,19 +379,26 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     @Override
     public void onValueSelected(Entry e, Highlight h) {
-        Log.i("I clicked on", String.valueOf(h.getX()) );
-        //Toast.makeText(getContext(), "chart clicked"+e.getData().toString(), Toast.LENGTH_SHORT).show();
+        //handles the section of the pie chart clicked
         switch(String.valueOf(h.getX())){
             case "0.0":
                 //flight clicked
+                recLayout.setVisibility(View.VISIBLE);
+                recTitle.setText("Flights");
+                recParagraph.setText("fly less lad");
                 Log.i("I clicked on flight", String.valueOf(h.getX()) );
                 break;
             case "1.0":
                 //food clicked
+                recLayout.setVisibility(View.VISIBLE);
+                recTitle.setText("Food");
+                recParagraph.setText("Eat less lad");
                 Log.i("I clicked on food", String.valueOf(h.getX()) );
                 break;
             case "2.0":
                 //clothing clicked
+                recLayout.setVisibility(View.VISIBLE);
+                recTitle.setText("Clothing");
                 Log.i("I clicked on clothing", String.valueOf(h.getX()) );
                 break;
 
@@ -247,6 +409,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     @Override
     public void onNothingSelected() {
+        recLayout.setVisibility(View.GONE);
         Log.i("nothing selected","a" );
         //set information invisible
 

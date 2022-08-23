@@ -41,6 +41,8 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -76,7 +78,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         View view = inflater.inflate(R.layout.fragment_flight, container, false);
        // flightList = new ArrayList<>();
         firebaseAuth = FirebaseAuth.getInstance();
-        fDatabase = FirebaseDatabase.getInstance().getReference("flights").child(firebaseAuth.getUid());
+        fDatabase = FirebaseDatabase.getInstance().getReference(firebaseAuth.getUid()).child("flights");
         fDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -162,7 +164,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
 
 
-        calculateFlightButton.setOnClickListener(new View.OnClickListener() {
+        saveFlightButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
@@ -208,17 +210,29 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                                         footprintInTonnes = footprintInTonnes * 2;
                                     }
 
-                                   //
-                                    // flightFootprint.setText(String.valueOf(footprintInTonnes) + " tonnes of CO2");
+                                    //save the flight to the db
+                                    final String flightID = UUID.randomUUID().toString();//create a unique id for a flight
+                                    Flight flight = new Flight(autoDepart.getText().toString().trim(), autoArrive.getText().toString().trim(), classSpinner.getSelectedItem().toString(), flightID, footprintInTonnes, getReturnFlight());
+                                    mDatabase.child(firebaseAuth.getUid()).child("flights").child(flightID).setValue(flight);
+                                    updateUserTotalFootprint(flight.getFootprint());
                                     getActivity().runOnUiThread(new Runnable() { // used to access ui thread so view can be updated
 
                                         @Override
                                         public void run() {
 
-                                            saveFlightButton.setVisibility(View.VISIBLE);
+                                            Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
+                                            addFlightLayout.setVisibility(View.GONE);
+                                            addFlightButton.setVisibility(View.VISIBLE);
+                                            autoDepart.setText("");
+                                            autoArrive.setText("");
 
                                         }
                                     });
+
+                                    userHasFlights();
+                                    calculationValid=false;
+                                    //reset autocompletes
+
 
                                 } else {
                                     getActivity().runOnUiThread(new Runnable() { // used to access ui thread so view can be updated
@@ -243,6 +257,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                     });
                     thread.start();
                 }
+
             }
 
         });
@@ -255,34 +270,34 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
             }
         });
 
-        saveFlightButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //add check to make sure a flight has been calculated
-                if(calculationValid){
-                    final String flightID = UUID.randomUUID().toString();//create a unique id for a flight
-                    Flight flight = new Flight(autoDepart.getText().toString().trim(), autoArrive.getText().toString().trim(), classSpinner.getSelectedItem().toString(), flightID, footprintInTonnes, getReturnFlight());
-                    mDatabase.child("flights").child(firebaseAuth.getUid()).child(flightID).setValue(flight);
-                    updateUserTotalFootprint(flight.getFootprint());
-                    Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
-                    addFlightLayout.setVisibility(View.GONE);
-                    addFlightButton.setVisibility(View.VISIBLE);
-                    userHasFlights();
-                    calculationValid=false;
-                    //reset autocompletes
-                    autoDepart.setText("");
-                    autoArrive.setText("");
-                }else{
-                    Toast.makeText(getContext(), "Please calculate a flight first", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
+//        saveFlightButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                //add check to make sure a flight has been calculated
+//                if(calculationValid){
+//                    final String flightID = UUID.randomUUID().toString();//create a unique id for a flight
+//                    Flight flight = new Flight(autoDepart.getText().toString().trim(), autoArrive.getText().toString().trim(), classSpinner.getSelectedItem().toString(), flightID, footprintInTonnes, getReturnFlight());
+//                    mDatabase.child(firebaseAuth.getUid()).child("flights").child(flightID).setValue(flight);
+//                    updateUserTotalFootprint(flight.getFootprint());
+//                    Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
+//                    addFlightLayout.setVisibility(View.GONE);
+//                    addFlightButton.setVisibility(View.VISIBLE);
+//                    userHasFlights();
+//                    calculationValid=false;
+//                    //reset autocompletes
+//                    autoDepart.setText("");
+//                    autoArrive.setText("");
+//                }else{
+//                    Toast.makeText(getContext(), "Please calculate a flight first", Toast.LENGTH_SHORT).show();
+//                }
+//
+//            }
+//        });
 
     }
 
     private void userHasFlights() {
-        FirebaseDatabase.getInstance().getReference("flights").child(firebaseAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference(firebaseAuth.getUid()).child("flights").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -315,7 +330,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
     }
 
     private void updateUserTotalFootprint(double d) {
-        mDatabase.child("footprint").child(firebaseAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child(firebaseAuth.getUid()).child("footprint").addListenerForSingleValueEvent(new ValueEventListener() {
             double newFlightFootprint;
 
             @Override
@@ -324,9 +339,10 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                 if (snapshot.exists()) {
                     Footprint footprint = snapshot.getValue(Footprint.class);
                     newFlightFootprint = footprint.getFlight() + d;
-                    mDatabase.child("footprint").child(firebaseAuth.getUid()).child("flight").setValue(newFlightFootprint);
+                   // mDatabase.child("footprint").child(firebaseAuth.getUid()).child("flight").setValue(round(newFlightFootprint,2));
+                    mDatabase.child(firebaseAuth.getUid()).child("footprint").child("flight").setValue(newFlightFootprint);
                     totalLayout.setVisibility(View.VISIBLE);
-                    flightFootprint.setText(String.valueOf(df.format(newFlightFootprint) ) + " tonnes of CO2");
+                    flightFootprint.setText(String.valueOf(round(newFlightFootprint,2) ) + " tonnes of CO2");
                 }
             }
 
@@ -337,7 +353,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
     }
 
     private void setTotalFootprint() {
-        mDatabase.child("footprint").child(firebaseAuth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child(firebaseAuth.getUid()).child("footprint").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -405,7 +421,13 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+    public double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
 
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
 
 
 }

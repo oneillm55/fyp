@@ -94,10 +94,10 @@ public class ClothingFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                totalLbs=round(calculateClothesTotal(),2);
+                //totalLbs=round(calculateClothesTotal(),2);
                // clothesTotal.setText(String.valueOf(totalLbs+"lbs of CO2"));
                 Clothing clothing = new Clothing(airDryLbs, secondHandLbs, sustainableLbs, coldWashLbs, returnLbs,totalLbs, airDrySlider.getValue(), secondHandSlider.getValue(), sustainableSlider.getValue(),coldWashSlider.getValue(), returnSlider.getValue(),returnOnlineSlider.getValue());
-                mDatabase.child("clothing").child(userID).setValue(clothing);
+                mDatabase.child(userID).child("clothing").setValue(clothing);
                 updateUserFootprint(convertPoundToTon(calculateClothesTotal()));
                 Toast.makeText(getContext(), "Clothing data Saved", Toast.LENGTH_SHORT).show();
 
@@ -112,11 +112,12 @@ public class ClothingFragment extends Fragment {
     }
 
     public void updateUserFootprint(double d) {
-        mDatabase.child("footprint").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.child(userID).child("footprint").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    mDatabase.child("footprint").child(userID).child("clothing").setValue(d);
+                   // mDatabase.child("footprint").child(userID).child("clothing").setValue(round(d,2));
+                    mDatabase.child(userID).child("footprint").child("clothing").setValue(d);
                 }
             }
 
@@ -229,7 +230,7 @@ public class ClothingFragment extends Fragment {
         }
 
         public void updateDisplayTotal(){
-            clothesTotal.setText(String.valueOf(df.format(convertPoundToTon(calculateClothesTotal()))+"Tonnes of CO2"));
+            clothesTotal.setText(String.valueOf(round(convertPoundToTon(calculateClothesTotal()),2)+"Tonnes of CO2"));
         }
 
 

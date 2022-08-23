@@ -21,8 +21,11 @@ import com.example.fyp.AppDrawer.DrawerActivity;
 import com.example.fyp.R;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -45,9 +48,86 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
+        userID = firebaseAuth.getUid();
+        mDatabase.child(userID).child("food").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Food food = snapshot.getValue(Food.class);
+                    //set spinner values to users current saved inputs
+                    int spinnerPosition;
+                    ArrayAdapter<CharSequence> meatAdapter = ArrayAdapter.createFromResource(getContext(), R.array.meat_spinner_options, android.R.layout.simple_spinner_item);
+                    spinnerPosition = meatAdapter.getPosition(food.getMeatString());
+                    meatSpinner.setSelection(spinnerPosition);
+
+                    ArrayAdapter<CharSequence> dairyAdapter = ArrayAdapter.createFromResource(getContext(), R.array.dairy_spinner_options, android.R.layout.simple_spinner_item);
+                    spinnerPosition = dairyAdapter.getPosition(food.getDairyString());
+                    dairySpinner.setSelection(spinnerPosition);
+
+                    ArrayAdapter<CharSequence> compostAdapter = ArrayAdapter.createFromResource(getContext(), R.array.yes_no_spinner_options, android.R.layout.simple_spinner_item);
+                    spinnerPosition = compostAdapter.getPosition(food.getCompostString());
+                    compostSpinner.setSelection(spinnerPosition);
+
+                    ArrayAdapter<CharSequence> organicAdapter = ArrayAdapter.createFromResource(getContext(), R.array.organic_spinner_options, android.R.layout.simple_spinner_item);
+                    spinnerPosition = organicAdapter.getPosition(food.getOrganicString());
+                    organicSpinner.setSelection(spinnerPosition);
+
+                    ArrayAdapter<CharSequence> shoppingAdapter = ArrayAdapter.createFromResource(getContext(), R.array.shopping_spinner_options, android.R.layout.simple_spinner_item);
+                    spinnerPosition = shoppingAdapter.getPosition(food.getShoppingString());
+                    shoppingSpinner.setSelection(spinnerPosition);
+
+
+                }
+            }
+            @Override
+            public void onCancelled (@NonNull DatabaseError error){
+
+            }
+        });
         return inflater.inflate(R.layout.fragment_food,container,false);
 
 
+    }
+
+    private void setValues() {
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child(userID).child("food").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Food food = snapshot.getValue(Food.class);
+                    //set spinner values to users current saved inputs
+                    int spinnerPosition;
+                    ArrayAdapter<CharSequence> meatAdapter = ArrayAdapter.createFromResource(getContext(), R.array.meat_spinner_options, android.R.layout.simple_spinner_item);
+                    spinnerPosition = meatAdapter.getPosition(food.getMeatString());
+                    meatSpinner.setSelection(spinnerPosition);
+
+                    ArrayAdapter<CharSequence> dairyAdapter = ArrayAdapter.createFromResource(getContext(), R.array.dairy_spinner_options, android.R.layout.simple_spinner_item);
+                    spinnerPosition = dairyAdapter.getPosition(food.getDairyString());
+                    dairySpinner.setSelection(spinnerPosition);
+
+                    ArrayAdapter<CharSequence> compostAdapter = ArrayAdapter.createFromResource(getContext(), R.array.yes_no_spinner_options, android.R.layout.simple_spinner_item);
+                    spinnerPosition = compostAdapter.getPosition(food.getCompostString());
+                    compostSpinner.setSelection(spinnerPosition);
+
+                    ArrayAdapter<CharSequence> organicAdapter = ArrayAdapter.createFromResource(getContext(), R.array.organic_spinner_options, android.R.layout.simple_spinner_item);
+                    spinnerPosition = organicAdapter.getPosition(food.getOrganicString());
+                    organicSpinner.setSelection(spinnerPosition);
+
+                    ArrayAdapter<CharSequence> shoppingAdapter = ArrayAdapter.createFromResource(getContext(), R.array.shopping_spinner_options, android.R.layout.simple_spinner_item);
+                    spinnerPosition = shoppingAdapter.getPosition(food.getShoppingString());
+                    shoppingSpinner.setSelection(spinnerPosition);
+
+
+                }
+            }
+            @Override
+            public void onCancelled (@NonNull DatabaseError error){
+
+            }
+        });
     }
 
     @Override
@@ -101,10 +181,10 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
             @Override
             public void onClick(View view) {
                 updateDisplay();
-                mDatabase.child("footprint").child(firebaseAuth.getUid()).child("food").setValue(getFoodCO2());
+                mDatabase.child(firebaseAuth.getUid()).child("footprint").child("food").setValue(getFoodCO2());
                 // to do only update this data when user wants to save input ie allow them to check the value based on their input into the spinners before they save it to firebase
                 Food food = new Food(meatString,dairyString, compostString, organicString,shoppingString,meatValue,dairyValue,compostValue,organicValue,shoppingValue,foodValue);
-                mDatabase.child("food").child(firebaseAuth.getUid()).setValue(food);
+                mDatabase.child(firebaseAuth.getUid()).child("food").setValue(food);
             }
         });
     }

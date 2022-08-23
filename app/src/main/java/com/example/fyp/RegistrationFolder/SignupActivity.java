@@ -90,7 +90,7 @@ public class SignupActivity extends AppCompatActivity {
                                 //realtime
                                  User user = new User(busername,bemail,bpassword," ");
 
-                                 mDatabase.child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user);
+                                 mDatabase.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("user").setValue(user);
 
 
                                 Toast.makeText(getApplicationContext(), "Registration Complete", Toast.LENGTH_SHORT).show();

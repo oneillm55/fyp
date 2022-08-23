@@ -73,7 +73,7 @@ public class UserFragment extends Fragment {
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("users").child(userID);
+        databaseReference = FirebaseDatabase.getInstance().getReference(userID).child("user");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -185,7 +185,7 @@ public class UserFragment extends Fragment {
 
     private void updateImageChanged() {
         //set the users ImageID varible to be the time the image was edited
-        mDatabase.child("users").child(userID).child("imageID").setValue(imageKey);
+        mDatabase.child(userID).child("user").child("imageID").setValue(imageKey);
 
     }
 
