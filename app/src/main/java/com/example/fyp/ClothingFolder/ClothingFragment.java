@@ -45,6 +45,9 @@ public class ClothingFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        //load slders to be at previously set values
+
         return inflater.inflate(R.layout.fragment_clothing, container, false);
     }
 
@@ -96,7 +99,8 @@ public class ClothingFragment extends Fragment {
             public void onClick(View view) {
                 //totalLbs=round(calculateClothesTotal(),2);
                // clothesTotal.setText(String.valueOf(totalLbs+"lbs of CO2"));
-                Clothing clothing = new Clothing(airDryLbs, secondHandLbs, sustainableLbs, coldWashLbs, returnLbs,totalLbs, airDrySlider.getValue(), secondHandSlider.getValue(), sustainableSlider.getValue(),coldWashSlider.getValue(), returnSlider.getValue(),returnOnlineSlider.getValue());
+                totalLbs=calculateClothesTotal();
+                Clothing clothing = new Clothing(convertPoundToTon(airDryLbs), convertPoundToTon(secondHandLbs), convertPoundToTon(sustainableLbs), convertPoundToTon(coldWashLbs),convertPoundToTon(returnLbs) ,convertPoundToTon(totalLbs) , airDrySlider.getValue(), secondHandSlider.getValue(), sustainableSlider.getValue(),coldWashSlider.getValue(), returnSlider.getValue(),returnOnlineSlider.getValue());
                 mDatabase.child(userID).child("clothing").setValue(clothing);
                 updateUserFootprint(convertPoundToTon(calculateClothesTotal()));
                 Toast.makeText(getContext(), "Clothing data Saved", Toast.LENGTH_SHORT).show();
@@ -109,6 +113,29 @@ public class ClothingFragment extends Fragment {
     public double convertPoundToTon(double pound) {
         return (double) (pound * 0.000453592);
         // return 1.0;
+    }
+//  call this method if to set the ew to be populated with the data the user already has
+    public void setSliderValues(double d) {
+        mDatabase.child(userID).child("clothing").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Clothing clothing = snapshot.getValue(Clothing.class);
+                    //set all views visible
+                    airDrySlider.setValue((float) clothing.getAirDryPercent());
+                    secondHandSlider.setValue((float) clothing.getSecondHandPercent());
+                    sustainableSlider.setValue((float) clothing.getSustainablePercent());
+                    coldWashSlider.setValue((float) clothing.getColdWashPercent());
+                    returnSlider.setValue((float) clothing.getReturnPercent());
+                    returnOnlineSlider.setValue((float) clothing.getReturnOnlinePercent());
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
     }
 
     public void updateUserFootprint(double d) {
@@ -129,12 +156,12 @@ public class ClothingFragment extends Fragment {
 
     private double calculateClothesTotal() {
 
-        if(coldWashEdited) {
-            coldWashLbs =(43-(coldWashSlider.getValue()*.43));//todo fix calculations
+        if(coldWashEdited) {//check if the user has interacted with the slider
+            coldWashLbs =(43-(coldWashSlider.getValue()*.43));
         }
 
-        if(airDryEdited) {//check if the user has interacted with the slider
-            airDryLbs =(447-(airDrySlider.getValue()*4.47));//todo fix calculations
+        if(airDryEdited) {
+            airDryLbs =(447-(airDrySlider.getValue()*4.47));
         }
 
         if(secondHandEdited) {
@@ -146,13 +173,19 @@ public class ClothingFragment extends Fragment {
         }
 
         if(returnEdited) {
-            returnLbs =returnSlider.getValue()*1;//1lbs od co2 per return from Thred up calculator
+            returnLbs =returnSlider.getValue()*1;//1lbs of co2 per % return from Thred up calculator
+//            if(returnOnlineEdited) {
+//                returnLbs=0;
+//                returnLbs = ((100-returnOnlineSlider.getValue())*returnSlider.getValue())*1;//the percent of the
+//                returnLbs+= (returnOnlineSlider.getValue())*returnSlider.getValue()*.4;
+//            }
         }
 
         if(returnOnlineEdited) {
-            returnLbs = returnLbs -(returnOnlineSlider.getValue()*0.6);//online returns are 60% more efficient so for every % that's returned online vs returned normally -.6lbs of carbon
-        }
+            //online returns are 60% more efficient so for every % that's returned online vs returned normally -.6lbs of carbon
 
+            returnLbs -= ((returnSlider.getValue() * (returnOnlineSlider.getValue() / 100)) * 0.6);
+        }
 
         return airDryLbs + secondHandLbs + sustainableLbs + coldWashLbs + returnLbs;
     }

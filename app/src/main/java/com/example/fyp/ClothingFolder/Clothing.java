@@ -3,18 +3,18 @@ package com.example.fyp.ClothingFolder;
 import com.google.android.material.slider.Slider;
 
 public class Clothing {
-    double airDryLbs, secondHandLbs, sustainableLbs, coldWashLbs, returnLbs, totalLbs, airDryPercent, secondHandPercent, sustainablePercent, coldWashPercent, returnPercent, returnOnlinePercent;
+    double airDryT, secondHandT, sustainableT, coldWashT, returnT, totalT, airDryPercent, secondHandPercent, sustainablePercent, coldWashPercent, returnPercent, returnOnlinePercent;
 
     public Clothing() {
     }
 
-    public Clothing(double airDryLbs, double secondHandLbs, double sustainableLbs, double coldWashLbs, double returnLbs, double totalLbs, double airDryPercent, double secondHandPercent, double sustainablePercent, double coldWashPercent, double returnPercent, double returnOnlinePercent) {
-        this.airDryLbs = airDryLbs;
-        this.secondHandLbs = secondHandLbs;
-        this.sustainableLbs = sustainableLbs;
-        this.coldWashLbs = coldWashLbs;
-        this.returnLbs = returnLbs;
-        this.totalLbs = totalLbs;
+    public Clothing(double airDryT, double secondHandT, double sustainableT, double coldWashT, double returnT, double totalT, double airDryPercent, double secondHandPercent, double sustainablePercent, double coldWashPercent, double returnPercent, double returnOnlinePercent) {
+        this.airDryT = airDryT;
+        this.secondHandT = secondHandT;
+        this.sustainableT = sustainableT;
+        this.coldWashT = coldWashT;
+        this.returnT = returnT;
+        this.totalT = totalT;
         this.airDryPercent = airDryPercent;
         this.secondHandPercent = secondHandPercent;
         this.sustainablePercent = sustainablePercent;
@@ -23,52 +23,52 @@ public class Clothing {
         this.returnOnlinePercent = returnOnlinePercent;
     }
 
-    public double getAirDryLbs() {
-        return airDryLbs;
+    public double getAirDryT() {
+        return airDryT;
     }
 
-    public void setAirDryLbs(double airDryLbs) {
-        this.airDryLbs = airDryLbs;
+    public void setAirDryT(double airDryT) {
+        this.airDryT = airDryT;
     }
 
-    public double getSecondHandLbs() {
-        return secondHandLbs;
+    public double getSecondHandT() {
+        return secondHandT;
     }
 
-    public void setSecondHandLbs(double secondHandLbs) {
-        this.secondHandLbs = secondHandLbs;
+    public void setSecondHandT(double secondHandT) {
+        this.secondHandT = secondHandT;
     }
 
-    public double getSustainableLbs() {
-        return sustainableLbs;
+    public double getSustainableT() {
+        return sustainableT;
     }
 
-    public void setSustainableLbs(double sustainableLbs) {
-        this.sustainableLbs = sustainableLbs;
+    public void setSustainableT(double sustainableT) {
+        this.sustainableT = sustainableT;
     }
 
-    public double getColdWashLbs() {
-        return coldWashLbs;
+    public double getColdWashT() {
+        return coldWashT;
     }
 
-    public void setColdWashLbs(double coldWashLbs) {
-        this.coldWashLbs = coldWashLbs;
+    public void setColdWashT(double coldWashT) {
+        this.coldWashT = coldWashT;
     }
 
-    public double getReturnLbs() {
-        return returnLbs;
+    public double getReturnT() {
+        return returnT;
     }
 
-    public void setReturnLbs(double returnLbs) {
-        this.returnLbs = returnLbs;
+    public void setReturnT(double returnT) {
+        this.returnT = returnT;
     }
 
-    public double getTotalLbs() {
-        return totalLbs;
+    public double getTotalT() {
+        return totalT;
     }
 
-    public void setTotalLbs(double totalLbs) {
-        this.totalLbs = totalLbs;
+    public void setTotalT(double totalT) {
+        this.totalT = totalT;
     }
 
     public double getAirDryPercent() {
@@ -118,4 +118,9 @@ public class Clothing {
     public void setReturnOnlinePercent(double returnOnlinePercent) {
         this.returnOnlinePercent = returnOnlinePercent;
     }
+
+    
+    //return largest emmitter lbs
+
+    //return biggest %
 }

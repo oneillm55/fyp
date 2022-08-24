@@ -45,6 +45,7 @@
         <item>Los Angeles International(LAX)</item>
         <item>Shannon(SNN)</item>
     </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="cold_wash_total">43</string>
 </resources>

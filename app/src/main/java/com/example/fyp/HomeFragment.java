@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,11 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,6 +48,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,17 +57,18 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     private PieChart pieChart;
     private BarChart barChart;
     private FirebaseAuth firebaseAuth;
-    private DatabaseReference mDatabase;
+    private DatabaseReference mDatabase,footprintReference;
     private  double foodCO2,flightCO2,clothingCO2,totalCO2;
     private TextView totalCO2TextView, recTitle,recParagraph, barChartTitle;
     private LinearLayout pieChartLayout, barChartLayout,recLayout,big3Layout;
     private boolean userHasData;
     private ArrayList<Integer> colors;
     Footprint userFootprint = new Footprint();
-    Clothing userClothing;
-    Food userFood;
-    private List<Flight> userFlightList;
-    private String userID;
+//    Clothing userClothing;
+//    Food userFood;
+//    private List<Flight> userFlightList;
+    private String userID ,recParagraphContent;
+
 
     public HomeFragment() {
         // Required empty public constructor
@@ -69,59 +78,95 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // colors array has to be done in on create as it uses getResources()
-        colors = new ArrayList<>();
-        colors.add(getResources().getColor(R.color.blue_jeans));
-        colors.add(getResources().getColor(R.color.cyber_yellow));
-        colors.add(getResources().getColor(R.color.heat_wave));
+
         firebaseAuth = FirebaseAuth.getInstance();
         userID=firebaseAuth.getCurrentUser().getUid();
         mDatabase= FirebaseDatabase.getInstance().getReference();
 
-        readData(new FirebaseCallback() {
+         mDatabase.child(userID).child("footprint").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onCallBack(Clothing clothing) {
-                // error is here user clothing is
-                userClothing = clothing;
-                setBig3(clothing.getAirDryLbs());
-            }
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {//check that user has a flight/ food / clothing footprint value
+                    Footprint footprint = snapshot.getValue(Footprint.class);
+                    //userFootprint=footprint;
+                   // ((MyApplication) getActivity().getApplication()).setUserFootprint(footprint);
 
-
-            @Override
-            public void onCallBack(Footprint footprint) {
-                userFootprint=footprint;
-                if(footprint.getFlight()!=0){//add check that user has values assigned to it
-                ////                      load user specific views
-                        userHasData=true;
                         flightCO2=footprint.getFlight();
                         clothingCO2=footprint.getClothing();
                         foodCO2=footprint.getFood();
                         totalCO2=foodCO2+flightCO2+clothingCO2;
                         totalCO2TextView.setText("Annual CO2 output:\n"+String.format("%.2f", totalCO2)+" Tonnes");
-                        setUpPieChart();
-                        loadPieChartData();
-                }else {
-                    //load basic home page
+                        userFootprint = footprint;
+
+                    setUpPieChart();
+                    loadPieChartData();
                 }
-                        setUpBarChart();//bar chart always called as it has its own functionality for handling user with or without data
-                        loadBarChartData();
-            }
 
+            }
             @Override
-            public void onCallBack(List<Flight> flightList) {
-                    userFlightList= flightList;
-            }
+            public void onCancelled (@NonNull DatabaseError error){
 
-            @Override
-            public void onCallBack(Food food) {
-                    userFood=food;
             }
-
         });
 
-      //  setUserFootprint();
+        mDatabase.child(userID).child("clothing").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Clothing clothing = snapshot.getValue(Clothing.class);
+                    //I need to be able to compare the clothing object to the userFootprint but userfootprint can on be accessed insode the onDataChange for the footprint query
+                  //  userFootprint.getClothing();
+                    WashingRec washingRec= washing(clothing);
+                    PurchasingRec purchasingRec = purchasing(clothing);
+                    ReturnClothingRec returnClothingRec = returnClothing(clothing);
+
+                    setClothingRec(washingRec,purchasingRec,returnClothingRec, clothing);
+
+                }else{
+
+                }
+            }
+
+
+            @Override
+            public void onCancelled (@NonNull DatabaseError error){
+
+            }
+        });
+
+        // colors array has to be done in on create as it uses getResources()
+        colors = new ArrayList<>();
+        colors.add(getResources().getColor(R.color.blue_jeans));
+        colors.add(getResources().getColor(R.color.cyber_yellow));
+        colors.add(getResources().getColor(R.color.heat_wave));
         return inflater.inflate(R.layout.fragment_home, container, false);
 
+
+    }
+
+    private void setClothingRec(WashingRec washingRec, PurchasingRec purchasingRec, ReturnClothingRec returnClothingRec, Clothing clothing) {
+
+        double washing = washingRec.getTotalWashingTSaved(), purchasing  = purchasingRec.getTotalPurchasingTSaved(), returnClothing = returnClothingRec.getTotalReturnTSaved();
+        if(biggest(washing,purchasing,returnClothing)){
+
+            recParagraphContent = "We recommend changing your washing habits\n Save "+ String.valueOf(round(washing,2));
+            if(washingRec.isAirDry()){
+                recParagraphContent +="\n By air drying your laundry you could save "+ String.valueOf(round(washingRec.getAirDryTSaved(),2)+" tonnes of CO2");
+            }
+
+            if(washingRec.isColdWash()){
+                recParagraphContent +="\n By doing you laundry on a cold wash you could save "+ String.valueOf(round(washingRec.getColdWashTSaved(),2)+" tonnes of CO2");
+            }
+        }else if(biggest(purchasing,washing,returnClothing)){
+
+            recParagraphContent = "We recommend changing your purchasing habits\n Save "+ String.valueOf(round(purchasing,2));
+        }else if(biggest(returnClothing,washing,purchasing)){
+
+            recParagraphContent = "We recommend changing your shopping habits\n Save "+ String.valueOf(round(returnClothing,2));
+        }else{
+                //two of the values are equal
+            recParagraphContent = "You could benefit from changing more than one habit regarding your clothing consumption ";
+    }
 
     }
 
@@ -140,9 +185,75 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         recTitle= view.findViewById(R.id.recommendationTitle);
         recParagraph=view.findViewById(R.id.recommendationParagraph);
         big3Layout = view.findViewById(R.id.big3Layout);
-
-        Log.i("!!!!!", String.valueOf(userFootprint.getFlight()));
+    //    Footprint userFootprint = ((MyApplication) getActivity().getApplication()).getUserFootprint();
+    //   Log.i("!!!!!", String.valueOf(userFootprint.getFlight()));
      //get user data
+    }
+
+    private WashingRec washing(Clothing clothing) {
+
+        double airDryT=clothing.getAirDryT(), coldwashT=clothing.getColdWashT(), savedT=0,coldwashPercent = clothing.getColdWashPercent(),airDryPercent = clothing.getAirDryPercent();
+        WashingRec wr = new WashingRec();
+        //Reccomendation is to cold wash 100% of clothes and air dry 100%
+        // if((coldwashPercent*1.50)<100){//if user isnt currently at the recomended % of cold washesif its possible to wash 50% more on cold
+        if(coldwashPercent<100){//if user isnt currently at the recomended % of cold washes
+            //reccomend cold washing more
+            wr.setColdWash(true);
+            wr.setColdWashTSaved(coldwashT);
+        }
+
+        if(airDryPercent<100){
+            //reccomend airdry more
+            wr.setAirDry(true);
+            wr.setAirDryTSaved(airDryT);
+        }
+
+        return wr;
+
+
+    }
+
+    private PurchasingRec purchasing(Clothing clothing) {
+        PurchasingRec pr = new PurchasingRec();
+        double secondHandT=clothing.getSecondHandT(),sustainableT=clothing.getSustainableT(),secondHandPercent=clothing.getSecondHandPercent(),sustainablePercent=clothing.getSustainablePercent() ;
+
+        //Reccomend purchase 50% sustainable and 50% more second hand
+
+        if(sustainablePercent<50){
+            //reccomend sus more
+            pr.setSustainable(true);
+            //the amount the user would save if they purchased 50% of their clothes sustainably
+            //sustaibableT = current cost of purchasing sustaiablePercent of clothes sustaiably
+
+            double costFifity = 0.063276084;//cost of a user purchasing 50% of their clothes sustaiably
+           double sustainableTSaved = sustainableT-costFifity; //difference between users current cost and the cost of them purchasing 50% sustainably ie their potential savings
+           pr.setSustainableTSaved(sustainableTSaved);
+        }
+        if(secondHandPercent<(sustainablePercent*1.50)){//user can purchase 50% more second hand
+            //reccomend more second hand
+            double secondHandTSaved = secondHandT*.5;//amount they could save if they purchase 50% more second hand
+            pr.setSecondHand(true);
+            pr.setSecondHandTSaved(secondHandTSaved);
+        }
+        return pr;
+    }
+
+    private ReturnClothingRec returnClothing(Clothing clothing){
+        ReturnClothingRec rcr = new ReturnClothingRec();
+        double returnT = clothing.getReturnT(),returnOnlineT = clothing.getReturnT(),returnPercent = clothing.getReturnPercent(), returnOnlinePercent = clothing.getReturnOnlinePercent();
+
+        //recommend not returning any orders if you are return them online
+        if (returnPercent>0){
+            rcr.setReturnClothing(true);
+            rcr.setReturnTSaved(returnT);
+
+            if(returnOnlinePercent!=100){//if user is not already doing 100% of returns online
+                rcr.setReturnOnline(true);
+                //online orders are 60% more efficient(Thred up) therefore returning all orders online would reduce by 60%
+                rcr.setReturnOnlineTSaved(returnT*.4);//the amount you would save by doing 100% of returns online
+            }
+        }
+        return rcr;
     }
 
     public void setUserFootprint(){
@@ -151,7 +262,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {//check that user has a flight/ food / clothing footprint value
                     Footprint footprint = snapshot.getValue(Footprint.class);
-                    userFootprint =footprint;
+                    //userFootprint =footprint;
                 }
 
             }
@@ -187,9 +298,9 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 if (snapshot.exists()) {
                     Clothing clothing = snapshot.getValue(Clothing.class);
                     //do whats required with user clothing
-                    Log.i("in clothing", String.valueOf(clothing.getAirDryLbs()));
+                    Log.i("in clothing", String.valueOf(clothing.getAirDryT()));
 
-                    Toast.makeText(getContext(), "in clothing"+String.valueOf(clothing.getAirDryLbs()), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "in clothing"+String.valueOf(clothing.getAirDryT()), Toast.LENGTH_SHORT).show();
                     firebaseCallback.onCallBack(clothing);
                 }else{
                     Log.i("in clothing","Doesnt exist");
@@ -399,6 +510,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 //clothing clicked
                 recLayout.setVisibility(View.VISIBLE);
                 recTitle.setText("Clothing");
+                recParagraph.setText(recParagraphContent);
                 Log.i("I clicked on clothing", String.valueOf(h.getX()) );
                 break;
 
@@ -406,7 +518,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
 
     }
-
     @Override
     public void onNothingSelected() {
         recLayout.setVisibility(View.GONE);
@@ -414,4 +525,22 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         //set information invisible
 
     }
+
+    public double convertPoundToTon(double pound) {
+        return (double) (pound * 0.000453592);
+        // return 1.0;
+    }
+
+    public double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
+    public boolean biggest(double max,double val1, double val2) {
+        return max > val1 && max > val2;
+    }
+
 }
