@@ -20,6 +20,12 @@
             android:text="0.0 Total CO2"
             android:textSize="30dp" />
 
+        <Button
+            android:id="@+id/recLevelButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recomendations:Conservative"/>
+
         <LinearLayout
             android:id="@+id/big3Layout"
             android:layout_width="match_parent"

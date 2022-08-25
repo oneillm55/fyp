@@ -1,4 +1,4 @@
-package com.example.fyp;
+package com.example.fyp.RecommendationsFolder.ClothingRecs;
 
 public class ReturnClothingRec {
     double returnTSaved , returnOnlineTSaved;// hold the balue of potentential tonnes of co2 saved

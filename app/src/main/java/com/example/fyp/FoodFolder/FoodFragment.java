@@ -51,41 +51,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
         mDatabase = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getUid();
-        mDatabase.child(userID).child("food").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Food food = snapshot.getValue(Food.class);
-                    //set spinner values to users current saved inputs
-                    int spinnerPosition;
-                    ArrayAdapter<CharSequence> meatAdapter = ArrayAdapter.createFromResource(getContext(), R.array.meat_spinner_options, android.R.layout.simple_spinner_item);
-                    spinnerPosition = meatAdapter.getPosition(food.getMeatString());
-                    meatSpinner.setSelection(spinnerPosition);
-
-                    ArrayAdapter<CharSequence> dairyAdapter = ArrayAdapter.createFromResource(getContext(), R.array.dairy_spinner_options, android.R.layout.simple_spinner_item);
-                    spinnerPosition = dairyAdapter.getPosition(food.getDairyString());
-                    dairySpinner.setSelection(spinnerPosition);
-
-                    ArrayAdapter<CharSequence> compostAdapter = ArrayAdapter.createFromResource(getContext(), R.array.yes_no_spinner_options, android.R.layout.simple_spinner_item);
-                    spinnerPosition = compostAdapter.getPosition(food.getCompostString());
-                    compostSpinner.setSelection(spinnerPosition);
-
-                    ArrayAdapter<CharSequence> organicAdapter = ArrayAdapter.createFromResource(getContext(), R.array.organic_spinner_options, android.R.layout.simple_spinner_item);
-                    spinnerPosition = organicAdapter.getPosition(food.getOrganicString());
-                    organicSpinner.setSelection(spinnerPosition);
-
-                    ArrayAdapter<CharSequence> shoppingAdapter = ArrayAdapter.createFromResource(getContext(), R.array.shopping_spinner_options, android.R.layout.simple_spinner_item);
-                    spinnerPosition = shoppingAdapter.getPosition(food.getShoppingString());
-                    shoppingSpinner.setSelection(spinnerPosition);
-
-
-                }
-            }
-            @Override
-            public void onCancelled (@NonNull DatabaseError error){
-
-            }
-        });
+        setValues();
         return inflater.inflate(R.layout.fragment_food,container,false);
 
 
@@ -332,7 +298,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
                 value = value + .03;
                 break;
             case "Most":
-                value = value + .03; //to do find accurate number
+                value = value + .015;
                 break;
         }
         organicValue= value;

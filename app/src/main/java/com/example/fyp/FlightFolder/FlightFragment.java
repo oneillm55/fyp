@@ -70,6 +70,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
     private Spinner classSpinner, returnSpinner;
     private ArrayAdapter<CharSequence> classAdapter, returnAdapter;
     private LinearLayout addFlightLayout,recyclerLayout,totalLayout;
+    private Boolean valid=false;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     @Nullable
@@ -125,7 +126,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         firebaseUser = firebaseAuth.getCurrentUser();
         userID = firebaseUser.getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        calculationValid = false;
+      //  calculationValid = false;
         airports = getResources().getStringArray(R.array.airports);
         addFlightLayout= view.findViewById(R.id.addFlightLayout);
         recyclerLayout= view.findViewById(R.id.recyclerLayout);
@@ -165,7 +166,6 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
 
         saveFlightButton.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
                 String bdepart = autoDepart.getText().toString().trim();
@@ -179,83 +179,9 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                 } else if (!validAirport(barrive) || !validAirport(bdepart)) {
                     Toast.makeText(getContext(), "Please use suggested inputs only", Toast.LENGTH_SHORT).show();
                 } else {
-                    Thread thread = new Thread(new Runnable() {// create a new thread to place the api call inside to prevent async errors
 
-                        @Override
-                        public void run() {
-                            try {
+                   getFlight(bdepart,barrive);
 
-                                URL url = new URL("https://api.goclimate.com/v1/flight_footprint?segments[0][origin]=" + getIATA(bdepart) + "&segments[0][destination]=" + getIATA(barrive) + "&cabin_class=" + getFlightClass());
-                                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                                conn.setRequestMethod("GET");
-                                conn.setRequestProperty("Accept", "application/json");
-                                conn.setRequestProperty("Authorization",
-                                        "Basic " + Base64.getEncoder().encodeToString((getString(R.string.go_climate_api_key) + ":").getBytes() //the api key for GoClimate
-                                        )
-                                );
-                                if (conn.getResponseCode() == 200 || conn.getResponseCode() == 200) {
-                                    calculationValid = true;
-                                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                                    StringBuilder stringBuilder = new StringBuilder();
-                                    String line;
-                                    while ((line = reader.readLine()) != null) {
-                                        stringBuilder.append(line);
-                                    }
-                                  //  Log.e("!!!: ", stringBuilder.toString());
-
-                                    JSONObject jsonResponse = new JSONObject(stringBuilder.toString());
-                                    double jsonFootprint = jsonResponse.getInt("footprint");
-                                    footprintInTonnes = jsonFootprint / 1000;
-                                    if (returnFlight) {
-                                        footprintInTonnes = footprintInTonnes * 2;
-                                    }
-
-                                    //save the flight to the db
-                                    final String flightID = UUID.randomUUID().toString();//create a unique id for a flight
-                                    Flight flight = new Flight(autoDepart.getText().toString().trim(), autoArrive.getText().toString().trim(), classSpinner.getSelectedItem().toString(), flightID, footprintInTonnes, getReturnFlight());
-                                    mDatabase.child(firebaseAuth.getUid()).child("flights").child(flightID).setValue(flight);
-                                    updateUserTotalFootprint(flight.getFootprint());
-                                    getActivity().runOnUiThread(new Runnable() { // used to access ui thread so view can be updated
-
-                                        @Override
-                                        public void run() {
-
-                                            Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
-                                            addFlightLayout.setVisibility(View.GONE);
-                                            addFlightButton.setVisibility(View.VISIBLE);
-                                            autoDepart.setText("");
-                                            autoArrive.setText("");
-
-                                        }
-                                    });
-
-                                    userHasFlights();
-                                    calculationValid=false;
-                                    //reset autocompletes
-
-
-                                } else {
-                                    getActivity().runOnUiThread(new Runnable() { // used to access ui thread so view can be updated
-
-                                        @Override
-                                        public void run() {
-                                            Toast.makeText(getContext(), "Invalid parameters", Toast.LENGTH_SHORT).show();
-
-                                        }
-                                    });
-                                    Log.e("URL : ", String.valueOf(url));
-                                    Log.e("Resonse code: ", String.valueOf(conn.getResponseCode()));
-                                    Log.e("Resonse message: ", String.valueOf(conn.getResponseMessage()));
-                                }
-
-                                conn.disconnect();
-
-                            } catch (IOException | JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                    thread.start();
                 }
 
             }
@@ -270,29 +196,102 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
             }
         });
 
-//        saveFlightButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                //add check to make sure a flight has been calculated
-//                if(calculationValid){
-//                    final String flightID = UUID.randomUUID().toString();//create a unique id for a flight
-//                    Flight flight = new Flight(autoDepart.getText().toString().trim(), autoArrive.getText().toString().trim(), classSpinner.getSelectedItem().toString(), flightID, footprintInTonnes, getReturnFlight());
-//                    mDatabase.child(firebaseAuth.getUid()).child("flights").child(flightID).setValue(flight);
-//                    updateUserTotalFootprint(flight.getFootprint());
-//                    Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
-//                    addFlightLayout.setVisibility(View.GONE);
-//                    addFlightButton.setVisibility(View.VISIBLE);
-//                    userHasFlights();
-//                    calculationValid=false;
-//                    //reset autocompletes
-//                    autoDepart.setText("");
-//                    autoArrive.setText("");
-//                }else{
-//                    Toast.makeText(getContext(), "Please calculate a flight first", Toast.LENGTH_SHORT).show();
-//                }
+
+    }
+
+    private void getFlight(String depart,String arrive) {
+        Thread thread = new Thread(new Runnable() {// create a new thread to place the api call inside to prevent async errors
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void run() {
+                try {
+                    //set up api call
+                    URL url = new URL("https://api.goclimate.com/v1/flight_footprint?segments[0][origin]=" + getIATA(depart) + "&segments[0][destination]=" + getIATA(arrive) + "&cabin_class=" + getFlightClass());
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("Accept", "application/json");
+                    conn.setRequestProperty("Authorization",
+                            "Basic " + Base64.getEncoder().encodeToString((getString(R.string.go_climate_api_key) + ":").getBytes() //the api key for GoClimate
+                            )
+                    );
+                    //handle api response
+                    if (conn.getResponseCode() == 200 || conn.getResponseCode() == 200) {
+                       // calculationValid = true;
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            stringBuilder.append(line);
+                        }
+
+                        JSONObject jsonResponse = new JSONObject(stringBuilder.toString());
+                        double jsonFootprint = jsonResponse.getInt("footprint");
+                        footprintInTonnes = jsonFootprint / 1000;
+                        if (returnFlight) {
+                            footprintInTonnes = footprintInTonnes * 2;
+                        }
+
+                        //save the flight to the db
+                        final String flightID = UUID.randomUUID().toString();//create a unique id for a flight
+                        Flight flight = new Flight(autoDepart.getText().toString().trim(), autoArrive.getText().toString().trim(), classSpinner.getSelectedItem().toString(), flightID, footprintInTonnes, getReturnFlight());
+                        mDatabase.child(firebaseAuth.getUid()).child("flights").child(flightID).setValue(flight);
+                        updateUserTotalFootprint(flight.getFootprint());
+                        valid=true;
+//                        getActivity().runOnUiThread(new Runnable() { // used to access ui thread so view can be updated
 //
-//            }
-//        });
+//                            @Override
+//                            public void run() {
+//
+//                                Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
+//                                addFlightLayout.setVisibility(View.GONE);
+//                                addFlightButton.setVisibility(View.VISIBLE);
+//                                autoDepart.setText("");
+//                                autoArrive.setText("");
+//
+//                            }
+//                        });
+
+                        userHasFlights();
+                        //calculationValid=false;
+                        //reset autocompletes
+
+
+                    } else {
+
+                        Log.e("URL : ", String.valueOf(url));
+                        Log.e("Resonse code: ", String.valueOf(conn.getResponseCode()));
+                        Log.e("Resonse message: ", String.valueOf(conn.getResponseMessage()));
+                        valid=false;
+                    }
+                    getActivity().runOnUiThread(new Runnable() { // used to access ui thread so view can be updated
+
+                            @Override
+                            public void run() {
+                                //move run on ui thread here on a condition
+                                if(valid){
+                                    Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
+                                    addFlightLayout.setVisibility(View.GONE);
+                                    addFlightButton.setVisibility(View.VISIBLE);
+                                    autoDepart.setText("");
+                                    autoArrive.setText("");
+                                    valid=false;
+                                }else{
+                                    Toast.makeText(getContext(), "Invalid parameters", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }
+                        });
+
+                    conn.disconnect();
+
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+        thread.start();
+
 
     }
 

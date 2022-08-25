@@ -1,4 +1,4 @@
-package com.example.fyp;
+package com.example.fyp.RecommendationsFolder.ClothingRecs;
 
 public class WashingRec {
     boolean coldWash,airDry;
