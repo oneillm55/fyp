@@ -56,7 +56,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
     private TextView flightFootprint;
     private EditText depart, arrival;
-    private Button calculateFlightButton, addFlightButton, saveFlightButton;
+    private Button cancelFlightButton, addFlightButton, saveFlightButton;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mDatabase,fDatabase;
     private FirebaseUser firebaseUser;
@@ -118,7 +118,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         arrival = view.findViewById(R.id.editTextArrive);
         autoArrive = view.findViewById(R.id.autoCompleteArrive);
         autoDepart = view.findViewById(R.id.autoCompleteDepart);
-        calculateFlightButton = view.findViewById(R.id.calculateFlightButton);
+        cancelFlightButton = view.findViewById(R.id.cancelFlightButton);
         addFlightButton = view.findViewById(R.id.openAddFlightButton);
         saveFlightButton = view.findViewById(R.id.saveFlightButton);
         flightFootprint = view.findViewById(R.id.flightFootprint);
@@ -186,6 +186,14 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
             }
 
+        });
+
+        cancelFlightButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addFlightLayout.setVisibility(View.GONE);
+                addFlightButton.setVisibility(View.VISIBLE);
+            }
         });
 
         addFlightButton.setOnClickListener(new View.OnClickListener() {
@@ -274,6 +282,8 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                                     addFlightButton.setVisibility(View.VISIBLE);
                                     autoDepart.setText("");
                                     autoArrive.setText("");
+                                    classSpinner.setSelection(0);
+                                    returnSpinner.setSelection(0);
                                     valid=false;
                                 }else{
                                     Toast.makeText(getContext(), "Invalid parameters", Toast.LENGTH_SHORT).show();

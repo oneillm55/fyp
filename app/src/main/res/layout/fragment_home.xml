@@ -31,7 +31,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/rec1Title"
@@ -179,6 +180,30 @@
             style="@style/border1"/>
 
     </LinearLayout>
+        <LinearLayout
+            android:id="@+id/foodPieChartLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:visibility="gone">
+            <TextView
+                android:id="@+id/foodPieChartLabel"
+                android:layout_width="150dp"
+                android:layout_height="300dp"
+                android:textAlignment="center"
+                android:text="The impact of your food consumption broken down"
+                android:textSize="25dp"/>
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/foodPieChart"
+                android:layout_width="250dp"
+                android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
+
+
+            <TextView
+                style="@style/border1"/>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/barChartLayout"

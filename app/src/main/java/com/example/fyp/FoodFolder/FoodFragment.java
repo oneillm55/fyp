@@ -59,7 +59,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
 
     private void setValues() {
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child(userID).child("food").addValueEventListener(new ValueEventListener() {
+        mDatabase.child(userID).child("food").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -177,6 +177,7 @@ public class FoodFragment extends Fragment implements AdapterView.OnItemSelected
                 updateDisplay();
                 break;
             case R.id.shopping_spinner:
+                shoppingString =adapterView.getItemAtPosition(i).toString();
                 updateDisplay();
                 break;
         }

@@ -1,10 +1,12 @@
 package com.example.fyp;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -22,6 +24,7 @@ import com.example.fyp.FoodFolder.Food;
 import com.example.fyp.RecommendationsFolder.ClothingRecs.PurchasingRec;
 import com.example.fyp.RecommendationsFolder.ClothingRecs.ReturnClothingRec;
 import com.example.fyp.RecommendationsFolder.ClothingRecs.WashingRec;
+import com.example.fyp.RecommendationsFolder.FlightRecs.FlightClassRec;
 import com.example.fyp.RecommendationsFolder.FoodRecs.CompostRec;
 import com.example.fyp.RecommendationsFolder.FoodRecs.DairyRec;
 import com.example.fyp.RecommendationsFolder.FoodRecs.MeatRec;
@@ -49,25 +52,38 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 
 public class HomeFragment extends Fragment implements OnChartValueSelectedListener {
-    private PieChart pieChart;
+    private PieChart pieChart, foodPieChart;
     private BarChart barChart;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mDatabase, footprintReference;
-    private double foodCO2, flightCO2, clothingCO2, totalCO2;
+    private double foodCO2, flightCO2, clothingCO2, totalCO2, newFlightFootprint,meatCO2, shoppingCO2, dairyCO2, compostCO2,organicCO2 ;
     private TextView totalCO2TextView, recTitle, recParagraph, barChartTitle;
-    private LinearLayout pieChartLayout, barChartLayout, recLayout, big3Layout;
+    private LinearLayout pieChartLayout,foodPieChartLayout, barChartLayout, recLayout, big3Layout;
     private boolean userHasData;
-    private ArrayList<Integer> colors;
-    private String userID, clothingRecContent, foodRecContent;
+    private ArrayList<Integer> colors,foodColors;
+    private String userID, clothingRecContent, foodRecContent, flightRecContent, goClimateApiKey;
     private String level="Conservative";
     private Button recLevelButton;
     Footprint userFootprint = new Footprint();
+    CountDownLatch latch = new CountDownLatch(1);
+
 //    Clothing userClothing;
 //    Food userFood;
 //    private List<Flight> userFlightList;
@@ -85,6 +101,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        goClimateApiKey=getString(R.string.go_climate_api_key);
 
 
         readData(new FirebaseCallback() {
@@ -122,6 +139,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
             @Override
             public void onCallBack(List<Flight> flightList) {
+                loadFlightViews(flightList);
 
             }
 
@@ -142,7 +160,67 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     }
 
+    private void loadFlightViews(List<Flight> flightList) {
+        FlightClassRec flightClassRec = getFlightClassRec(flightList);
+
+        setFlightRec(flightList,flightClassRec);
+    }
+
+    private void setFlightRec(List<Flight> flightList, FlightClassRec flightClassRec) {
+        flightRecContent="By flying economy on all your flights you could save "+String.valueOf(round(flightClassRec.getTSaved(),2));
+    }
+
+    private FlightClassRec getFlightClassRec(List<Flight> flightList) {
+        FlightClassRec fcr = new FlightClassRec();
+        //take the flight class loop it for every flight check class if not economy, calculate cost of flight if economy and add it to a new list then get the total flight cost for the new list vs old
+        double newTotal=0;//stores the new flight total if the user took all their flights economy
+        double currentTotal=0;// the users current flight footprint
+       for(Flight flight : flightList){
+           currentTotal+=flight.getFootprint();//get the current total footprint of all flights
+           //Log.i("!!!!!flightC",flight.getFlightClass());
+           if(flight.getFlightClass().trim().equalsIgnoreCase("Economy")){
+               //add its co2 to the new list or total
+               newTotal+=flight.getFootprint();
+             //  Log.i("!!!!!in economy"," economy");
+
+           }else{
+               //flight is business or first class
+               //reset new flight footprint
+              // newFlightFootprint=0;
+               //call the method that sets new flight footprint
+               Log.i("!!!!!newFF1", String.valueOf(newFlightFootprint));
+               getNewFlightFootprint(flight.getDepart(), flight.getArrive(), flight.getReturnFlight());//this will set newFlight footprint to be the value of the current flight if flown economy
+               //use new flight footprint value
+               try {
+                   latch.await();//wait for newFlightFootprint to be assigned
+               } catch (InterruptedException e) {
+                   e.printStackTrace();
+               }
+               newTotal+=newFlightFootprint;// todo this is null
+                 Log.i("!!!!!newFF2", String.valueOf(newFlightFootprint));
+               //reset new flight footprint to be 0 again to prevent calculation errors
+               //newFlightFootprint=0;
+           };
+
+       }
+       //set this to be the total of all current flights - the total of flights if all economy
+     //   Log.i("!!!!!current", String.valueOf(currentTotal));
+     //   Log.i("!!!!!new", String.valueOf(newTotal));
+        double totalSaved = currentTotal-newTotal;
+
+       fcr.setTSaved(totalSaved);
+       return fcr;
+
+    }
+
     private void loadFoodViews(Food food) {
+        meatCO2=food.getMeatValue();
+        dairyCO2=food.getDairyValue();
+        shoppingCO2=food.getShoppingValue();
+        compostCO2=food.getCompostValue();
+        organicCO2=food.getOrganicValue();
+        setUpFoodPieChart();
+        loadFoodPieChartData();
         MeatRec meatRec = getMeatRec(food);
         DairyRec dairyRec = getDairyRec(food);
         ShoppingRec shoppingRec = getShoppingRec(food);
@@ -152,19 +230,69 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         setFoodRec(food, meatRec, dairyRec, shoppingRec, compostRec, organicRec);
     }
 
+    private void loadFoodPieChartData() {
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry((float) (meatCO2), "Meat"));
+        entries.add(new PieEntry((float) (dairyCO2), "Dairy"));
+        entries.add(new PieEntry((float) (shoppingCO2), "Shopping"));
+        entries.add(new PieEntry((float) (compostCO2), "Compost"));
+        entries.add(new PieEntry((float) (organicCO2), "Organic"));
+
+
+        PieDataSet dataSet = new PieDataSet(entries, "");
+        foodColors = new ArrayList<>();
+        foodColors.add(Color.parseColor("#FF0000"));
+        foodColors.add(Color.parseColor("#FF7300"));
+        foodColors.add(Color.parseColor("#52D726"));
+        foodColors.add(Color.parseColor("#FFEC00"));
+        foodColors.add(Color.parseColor("#007ED6"));
+        dataSet.setColors(foodColors);
+
+        PieData data = new PieData(dataSet);
+        data.setDrawValues(true);
+        data.setValueFormatter(new PercentFormatter(foodPieChart));
+        data.setValueTextSize(12f);
+        data.setValueTextColor(Color.BLACK);
+
+        foodPieChart.setData(data);
+        foodPieChart.invalidate();
+    }
+
+    private void setUpFoodPieChart() {
+       // foodPieChartLayout.setVisibility(View.VISIBLE);
+        foodPieChart.setDrawHoleEnabled(true);
+        foodPieChart.setUsePercentValues(true);
+        foodPieChart.setDrawEntryLabels(true);
+        foodPieChart.setEntryLabelTextSize(12);
+        foodPieChart.setEntryLabelColor(Color.BLACK);
+        foodPieChart.setCenterText("Food");
+        foodPieChart.setCenterTextSize(24);
+        foodPieChart.getDescription().setEnabled(false);
+        foodPieChart.setDrawEntryLabels(false);
+        foodPieChart.setTouchEnabled(false);
+
+        Legend l = foodPieChart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.VERTICAL);
+        l.setDrawInside(false);
+        l.setTextSize(10);
+        l.setEnabled(true);
+    }
+
     private void setFoodRec(Food food, MeatRec meatRec, DairyRec dairyRec, ShoppingRec shoppingRec, CompostRec compostRec, OrganicRec organicRec) {
         //set the values on the homepage with the recomendations that correspond to the passed parameters
-        double meat = meatRec.getMeatTSaved(), dairy = dairyRec.getDairyTSaved(), shopping = shoppingRec.getShoppingTSaved(), compost = compostRec.getCompostTSaved(), organic = organicRec.getOrganicTSaved();
+        double meat = meatRec.getTSaved(), dairy = dairyRec.getTSaved(), shopping = shoppingRec.getTSaved(), compost = compostRec.getTSaved(), organic = organicRec.getTSaved();
         if (biggestOfFive(meat, dairy, shopping, compost, organic)) {
-            foodRecContent="Biggest saving= meat\n Save"+ meatRec.getMeatTSaved();
+            foodRecContent="Biggest saving= meat\n Save"+ round(meat,2);
         } else if (biggestOfFive(dairy, shopping, compost, organic, meat)) {
-            foodRecContent="Biggest saving= dairy\n Save"+ dairyRec.getDairyTSaved();
+            foodRecContent="Biggest saving= dairy\n Save"+ round(dairy,2);
         } else if (biggestOfFive(shopping, compost, organic, meat, dairy)) {
-            foodRecContent="Biggest saving= shopping\n Save"+ shoppingRec.getShoppingTSaved();
+            foodRecContent="Biggest saving= shopping\n Save"+ round(shopping,2);
         } else if (biggestOfFive(compost, organic, meat, dairy, shopping)) {
-            foodRecContent="Biggest saving= compost\n Save"+ compostRec.getCompostTSaved();
+            foodRecContent="Biggest saving= compost\n Save"+ round(compost,2);
         } else if(biggestOfFive(organic, meat, dairy, shopping,compost)) {
-            foodRecContent="Biggest saving= organic\n Save"+ organicRec.getOrganicTSaved();
+            foodRecContent="Biggest saving= organic\n Save"+ round(organic,2);
         }else{
                 //two values are equal
             //get the two equal values and display the recomendation for the one with the larger overall output
@@ -172,6 +300,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     }
 
     private OrganicRec getOrganicRec(Food food) {
+        OrganicRec or = new OrganicRec();
         String organicString = food.getOrganicString(), suggestion = "";
         double organicValue = food.getOrganicValue(), organicTSaved = 0;
         switch (organicString) {
@@ -196,7 +325,9 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 }
                 break;
         }
-        return new OrganicRec(organicTSaved, organicString);
+        or.setTSaved(organicTSaved);
+        or.setSuggestion(organicString);
+        return or;
 
     }
 
@@ -212,7 +343,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 suggestion = "Yes";
                 break;
         }
-        cr.setCompostTSaved(compostTSaved);
+        cr.setTSaved(compostTSaved);
         cr.setSuggestion(suggestion);
         return cr;
     }
@@ -252,7 +383,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 break;
         }
         sr.setSuggestion(suggestion);
-        sr.setShoppingTSaved(shoppingTSaved);
+        sr.setTSaved(shoppingTSaved);
         return sr;
     }
 
@@ -280,7 +411,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         }
 
         dr.setSuggestion(suggestion);
-        dr.setDairyTSaved(dairyTSaved);
+        dr.setTSaved(dairyTSaved);
         return dr;
     }
 
@@ -320,7 +451,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 }
                 break;
         }
-        mr.setMeatTSaved(meatTSaved);
+        mr.setTSaved(meatTSaved);
         mr.setSuggestion(suggestion);
         return mr;
     }
@@ -446,6 +577,8 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         totalCO2TextView = view.findViewById(R.id.totalCO2);
         pieChart = view.findViewById(R.id.pieChart);
         pieChartLayout = view.findViewById(R.id.pieChartLayout);
+        foodPieChartLayout = view.findViewById(R.id.foodPieChartLayout);
+        foodPieChart= view.findViewById(R.id.foodPieChart);
         barChart = view.findViewById(R.id.barChart);
         barChartTitle = view.findViewById(R.id.barChartTitle);
         barChartLayout = view.findViewById(R.id.barChartLayout);
@@ -469,29 +602,8 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                                               }
                                           }
         );
-        //    Footprint userFootprint = ((MyApplication) getActivity().getApplication()).getUserFootprint();
-        //   Log.i("!!!!!", String.valueOf(userFootprint.getFlight()));
-        //get user data
     }
 
-    public void setUserFootprint() {
-        mDatabase.child("footprint").child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {//check that user has a flight/ food / clothing footprint value
-                    Footprint footprint = snapshot.getValue(Footprint.class);
-                    //userFootprint =footprint;
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Db error", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-    }
 
     private void readData(FirebaseCallback firebaseCallback) {
 
@@ -500,6 +612,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {//check that user has a flight/ food / clothing footprint value
                     Footprint footprint = snapshot.getValue(Footprint.class);
+                    userHasData=true;
                     firebaseCallback.onCallBack(footprint);
                 }
 
@@ -518,9 +631,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 if (snapshot.exists()) {
                     Clothing clothing = snapshot.getValue(Clothing.class);
                     //do whats required with user clothing
-                    Log.i("in clothing", String.valueOf(clothing.getAirDryT()));
-
-                    Toast.makeText(getContext(), "in clothing" + String.valueOf(clothing.getAirDryT()), Toast.LENGTH_SHORT).show();
                     firebaseCallback.onCallBack(clothing);
                 } else {
                     Log.i("in clothing", "Doesnt exist");
@@ -580,12 +690,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         void onCallBack(List<Flight> flightList);
 
         void onCallBack(Food food);
-    }
-
-    private void setBig3(double d) {
-        //go to the database, find the 3 biggest culprits for users footprint, set the big three to be those 3 in order of tonnes of co2 saved
-        Toast.makeText(getContext(), "d" + String.valueOf(d), Toast.LENGTH_SHORT).show();
-
     }
 
     private void setUpBarChart() {
@@ -701,7 +805,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 //flight clicked
                 recLayout.setVisibility(View.VISIBLE);
                 recTitle.setText("Flights");
-                recParagraph.setText("fly less lad");
+                recParagraph.setText(flightRecContent);
                 Log.i("I clicked on flight", String.valueOf(h.getX()));
                 break;
             case "1.0":
@@ -709,6 +813,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 recLayout.setVisibility(View.VISIBLE);
                 recTitle.setText("Food");
                 recParagraph.setText(foodRecContent);
+                foodPieChartLayout.setVisibility(View.VISIBLE);
                 Log.i("I clicked on food", String.valueOf(h.getX()));
                 break;
             case "2.0":
@@ -727,6 +832,9 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     @Override
     public void onNothingSelected() {
         recLayout.setVisibility(View.GONE);
+        if(foodPieChartLayout.getVisibility() == View.VISIBLE){
+            foodPieChartLayout.setVisibility(View.GONE);
+        }
         Log.i("nothing selected", "a");
         //set information invisible
 
@@ -756,6 +864,67 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     public boolean biggestOfFive(double max, double val1, double val2, double val3, double val4) {
         return max > val1 && max > val2 && max > val3 && max > val4;
+    }
+
+    private void getNewFlightFootprint(String depart,String arrive,boolean returnFlight) {
+        Thread thread = new Thread(new Runnable() {// create a new thread to place the api call inside to prevent async errors
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void run() {
+                try {
+                    //set up api call
+                    URL url = new URL("https://api.goclimate.com/v1/flight_footprint?segments[0][origin]=" + getIATA(depart) + "&segments[0][destination]=" + getIATA(arrive) + "&cabin_class=economy");//can hardcode class as economy because this will only be used to convert business and first class flights
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("Accept", "application/json");
+                    conn.setRequestProperty("Authorization",
+                            "Basic " + Base64.getEncoder().encodeToString((goClimateApiKey + ":").getBytes() //the api key for GoClimate
+                            )
+                    );
+                    //handle api response
+                    if (conn.getResponseCode() == 200 || conn.getResponseCode() == 200) {
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            stringBuilder.append(line);
+                        }
+
+                        JSONObject jsonResponse = new JSONObject(stringBuilder.toString());
+                        double jsonFootprint = jsonResponse.getInt("footprint");
+                        double newFootprint = jsonFootprint / 1000;//footprint is returned in kg therefore divide it by 1000
+                        if (returnFlight) {
+                            newFootprint = newFootprint * 2;
+                        }
+                        Log.i("!!!!!newFF", String.valueOf(newFootprint));
+                        Log.i("!!!!!newFF3", String.valueOf(newFlightFootprint));
+
+                            newFlightFootprint=newFootprint;
+                        latch.countDown();
+                        Log.i("!!!!!newFF4", String.valueOf(newFlightFootprint));//this is working
+                        //need to send this new footprint value to the getFlightRec method
+                    } else {
+
+                        Log.e("URL : ", String.valueOf(url));
+                        Log.e("Resonse code: ", String.valueOf(conn.getResponseCode()));
+                        Log.e("Resonse message: ", String.valueOf(conn.getResponseMessage()));
+                    }
+                    conn.disconnect();
+
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }finally{
+                    latch.countDown();
+                }
+            }
+
+        });
+        thread.start();
+
+    }
+
+    private String getIATA(String s) {
+        return s.substring(s.length() - 4, s.length() - 1);
     }
 
 }
