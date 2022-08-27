@@ -80,7 +80,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     private ArrayList<Integer> colors,foodColors;
     private String userID, clothingRecContent, foodRecContent, flightRecContent, goClimateApiKey;
     private String level="Conservative";
-    private Button recLevelButton;
     Footprint userFootprint = new Footprint();
     CountDownLatch latch = new CountDownLatch(1);
 
@@ -112,29 +111,24 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
             @Override
             public void onCallBack(Clothing clothing) {
-//                // a way for the app to use both the clothing and the footprint at once
-//                mDatabase.child(userID).child("footprint").addValueEventListener(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                        if (snapshot.exists()) {//check that user has a flight/ food / clothing footprint value
-//                            Footprint footprint = snapshot.getValue(Footprint.class);
-//
-//                            loadClothingViews(clothing);
-//                            WashingRec washingRec= washing(clothing);
-//                            PurchasingRec purchasingRec = purchasing(clothing);
-//                            ReturnClothingRec returnClothingRec = returnClothing(clothing);
-//
-//                            setClothingRec(washingRec,purchasingRec,returnClothingRec, clothing);
-//
-//                            //if footprint.get largest element is clothing set clothing rec to be at top of screen else set them to be in the rec paragraph for clothing
-//                        }
-//                    }
-//                    @Override
-//                    public void onCancelled (@NonNull DatabaseError error){
-//
-//                    }
-//                });
-                loadClothingViews(clothing);
+                // a way for the app to use both the clothing and the footprint at once
+                mDatabase.child(userID).child("footprint").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {//check that user has a flight/ food / clothing footprint value
+                            Footprint footprint = snapshot.getValue(Footprint.class);
+
+                            loadClothingViews(clothing,footprint);
+
+
+                            //if footprint.get largest element is clothing set clothing rec to be at top of screen else set them to be in the rec paragraph for clothing
+                        }
+                    }
+                    @Override
+                    public void onCancelled (@NonNull DatabaseError error){
+
+                    }
+                });
             }
 
             @Override
@@ -145,7 +139,20 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
             @Override
             public void onCallBack(Food food) {
-                loadFoodViews(food);
+                mDatabase.child(userID).child("footprint").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {//check that user has a flight/ food / clothing footprint value
+                            Footprint footprint = snapshot.getValue(Footprint.class);
+
+                            loadFoodViews(food,footprint);
+                        }
+                    }
+                    @Override
+                    public void onCancelled (@NonNull DatabaseError error){
+
+                    }
+                });
 
             }
         });
@@ -177,35 +184,25 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         double currentTotal=0;// the users current flight footprint
        for(Flight flight : flightList){
            currentTotal+=flight.getFootprint();//get the current total footprint of all flights
-           //Log.i("!!!!!flightC",flight.getFlightClass());
            if(flight.getFlightClass().trim().equalsIgnoreCase("Economy")){
-               //add its co2 to the new list or total
+               //add flight co2 to the new list
                newTotal+=flight.getFootprint();
-             //  Log.i("!!!!!in economy"," economy");
-
            }else{
-               //flight is business or first class
-               //reset new flight footprint
-              // newFlightFootprint=0;
-               //call the method that sets new flight footprint
-               Log.i("!!!!!newFF1", String.valueOf(newFlightFootprint));
-               getNewFlightFootprint(flight.getDepart(), flight.getArrive(), flight.getReturnFlight());//this will set newFlight footprint to be the value of the current flight if flown economy
+               //flight is business or first class therefore get its potention co2 if it were economy
+               getNewFlightFootprint(flight.getDepart(), flight.getArrive(), flight.isReturnFlight());//this will set newFlight footprint to be the value of the current flight if flown economy
                //use new flight footprint value
                try {
                    latch.await();//wait for newFlightFootprint to be assigned
                } catch (InterruptedException e) {
                    e.printStackTrace();
                }
-               newTotal+=newFlightFootprint;// todo this is null
-                 Log.i("!!!!!newFF2", String.valueOf(newFlightFootprint));
-               //reset new flight footprint to be 0 again to prevent calculation errors
-               //newFlightFootprint=0;
+               newTotal+=newFlightFootprint;
+                 Log.i("!!!!!newFF", String.valueOf(newFlightFootprint));
+               newFlightFootprint=0;
            };
 
        }
-       //set this to be the total of all current flights - the total of flights if all economy
-     //   Log.i("!!!!!current", String.valueOf(currentTotal));
-     //   Log.i("!!!!!new", String.valueOf(newTotal));
+       //total of all current flights - the total of flights if they were all economy
         double totalSaved = currentTotal-newTotal;
 
        fcr.setTSaved(totalSaved);
@@ -213,7 +210,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     }
 
-    private void loadFoodViews(Food food) {
+    private void loadFoodViews(Food food, Footprint footprint) {
         meatCO2=food.getMeatValue();
         dairyCO2=food.getDairyValue();
         shoppingCO2=food.getShoppingValue();
@@ -221,11 +218,11 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         organicCO2=food.getOrganicValue();
         setUpFoodPieChart();
         loadFoodPieChartData();
-        MeatRec meatRec = getMeatRec(food);
-        DairyRec dairyRec = getDairyRec(food);
-        ShoppingRec shoppingRec = getShoppingRec(food);
+        MeatRec meatRec = getMeatRec(food, footprint);
+        DairyRec dairyRec = getDairyRec(food,footprint);
+        ShoppingRec shoppingRec = getShoppingRec(food,footprint);
         CompostRec compostRec = getCompostRec(food);
-        OrganicRec organicRec = getOrganicRec(food);
+        OrganicRec organicRec = getOrganicRec(food,footprint);
 
         setFoodRec(food, meatRec, dairyRec, shoppingRec, compostRec, organicRec);
     }
@@ -284,22 +281,22 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         //set the values on the homepage with the recomendations that correspond to the passed parameters
         double meat = meatRec.getTSaved(), dairy = dairyRec.getTSaved(), shopping = shoppingRec.getTSaved(), compost = compostRec.getTSaved(), organic = organicRec.getTSaved();
         if (biggestOfFive(meat, dairy, shopping, compost, organic)) {
-            foodRecContent="Biggest saving= meat\n Save"+ round(meat,2);
+            foodRecContent="Biggest saving= meat\n Save"+ round(meat,2)+meatRec.getSuggestion();
         } else if (biggestOfFive(dairy, shopping, compost, organic, meat)) {
-            foodRecContent="Biggest saving= dairy\n Save"+ round(dairy,2);
+            foodRecContent="Biggest saving= dairy\n Save"+ round(dairy,2) + dairyRec.getSuggestion();
         } else if (biggestOfFive(shopping, compost, organic, meat, dairy)) {
-            foodRecContent="Biggest saving= shopping\n Save"+ round(shopping,2);
+            foodRecContent="Biggest saving= shopping\n Save"+ round(shopping,2)+ shoppingRec.getSuggestion();
         } else if (biggestOfFive(compost, organic, meat, dairy, shopping)) {
-            foodRecContent="Biggest saving= compost\n Save"+ round(compost,2);
+            foodRecContent="Biggest saving= compost\n Save"+ round(compost,2)+ compostRec.getSuggestion();
         } else if(biggestOfFive(organic, meat, dairy, shopping,compost)) {
-            foodRecContent="Biggest saving= organic\n Save"+ round(organic,2);
+            foodRecContent="Biggest saving= organic\n Save"+ round(organic,2)+ organicRec.getSuggestion();
         }else{
                 //two values are equal
             //get the two equal values and display the recomendation for the one with the larger overall output
         }
     }
 
-    private OrganicRec getOrganicRec(Food food) {
+    private OrganicRec getOrganicRec(Food food, Footprint footprint) {
         OrganicRec or = new OrganicRec();
         String organicString = food.getOrganicString(), suggestion = "";
         double organicValue = food.getOrganicValue(), organicTSaved = 0;
@@ -314,7 +311,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 break;
             case "None":
                 // value = value + .06;
-                if (serious()) {
+                if ((ambitious(footprint))) {
                     //most
                     organicTSaved = organicValue - 0.15;
                     suggestion = "Most";
@@ -348,7 +345,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         return cr;
     }
 
-    private ShoppingRec getShoppingRec(Food food) {
+    private ShoppingRec getShoppingRec(Food food, Footprint footprint) {
         ShoppingRec sr = new ShoppingRec();
         String shoppingString = food.getShoppingString(), suggestion = "";
         double shoppingValue = food.getShoppingValue(), shoppingTSaved = 0;
@@ -359,13 +356,13 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 //user already doing best they can
                 break;
             case "Mostly Local, some supermarkets":
-                shoppingTSaved = shoppingValue - 0.3;
+                shoppingTSaved = shoppingValue - 0.03;
                 suggestion = "Only local produce";
 
                 break;
             case "Mostly supermarkets, try to buy Irish":
-                if (serious()) {
-                    shoppingTSaved = shoppingValue - 0.3;
+                if ((ambitious(footprint))) {
+                    shoppingTSaved = shoppingValue - 0.03;
                     suggestion = "Only local produce";
                 } else {
                     shoppingTSaved = shoppingValue - 0.7;
@@ -373,8 +370,8 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 }
                 break;
             case "All supermarkets, pay no attention to country of origin":
-                if (serious()) {
-                    shoppingTSaved = shoppingValue - 0.3;
+                if ((ambitious(footprint))) {
+                    shoppingTSaved = shoppingValue - 0.03;
                     suggestion = "Only local produce";
                 } else {
                     shoppingTSaved = shoppingValue - 0.15;
@@ -387,7 +384,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         return sr;
     }
 
-    private DairyRec getDairyRec(Food food) {
+    private DairyRec getDairyRec(Food food,Footprint footprint) {
         DairyRec dr = new DairyRec();
         String dairyString = food.getDairyString(), suggestion = "";
         double dairyValue = food.getDairyValue(), dairyTSaved = 0;
@@ -399,7 +396,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 break;
             case "Every day":
                 //value = value + .07;
-                if (serious()) {
+                if ((ambitious(footprint))) {
                     dairyTSaved = dairyValue;
                     suggestion = "Never";
 
@@ -415,7 +412,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         return dr;
     }
 
-    private MeatRec getMeatRec(Food food) {
+    private MeatRec getMeatRec(Food food,Footprint footprint) {
         MeatRec mr = new MeatRec();
         String meatString = food.getMeatString(), suggestion = "";
         double meatValue = food.getMeatValue(), meatTSaved = 0;
@@ -429,8 +426,8 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
                 break;
             case "Once a day":
-                //user is eating meat once a day if they are serious they might consider removing meat from diet else reccomend occasionally
-                if (serious()) {
+                //user is eating meat once a day if they are serious they might consider removing meat from diet else recomend occasionally
+                if ((ambitious(footprint))) {
                     meatTSaved = meatValue;
                     suggestion = "Never";
                 } else {
@@ -441,7 +438,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 break;
             case "Most meals":
                 //if you ate once a day instead
-                if (serious()) {
+                if ((ambitious(footprint))) {
 
                     meatTSaved = meatValue - .08;
                     suggestion = "Occasionally";
@@ -456,15 +453,15 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         return mr;
     }
 
-    private void loadClothingViews(Clothing clothing) {
-        WashingRec washingRec = getWashingRec(clothing);
+    private void loadClothingViews(Clothing clothing,Footprint footprint) {
+        WashingRec washingRec = getWashingRec(clothing,footprint);
         PurchasingRec purchasingRec = getPurchasingRec(clothing);
         ReturnClothingRec returnClothingRec = getReturnClothingRec(clothing);
 
-        setClothingRec(washingRec, purchasingRec, returnClothingRec, clothing);
+        setClothingRec(washingRec, purchasingRec, returnClothingRec, clothing,footprint);
     }
 
-    private void setClothingRec(WashingRec washingRec, PurchasingRec purchasingRec, ReturnClothingRec returnClothingRec, Clothing clothing) {
+    private void setClothingRec(WashingRec washingRec, PurchasingRec purchasingRec, ReturnClothingRec returnClothingRec, Clothing clothing, Footprint footprint) {
 
         double washing = washingRec.getTotalWashingTSaved(), purchasing = purchasingRec.getTotalPurchasingTSaved(), returnClothing = returnClothingRec.getTotalReturnTSaved();
         if (biggestOfThree(washing, purchasing, returnClothing)) {
@@ -490,20 +487,37 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     }
 
-    private WashingRec getWashingRec(Clothing clothing) {
+    private WashingRec getWashingRec(Clothing clothing,Footprint footprint) {
 
         double airDryT = clothing.getAirDryT(), coldwashT = clothing.getColdWashT(), savedT = 0, coldwashPercent = clothing.getColdWashPercent(), airDryPercent = clothing.getAirDryPercent();
         WashingRec wr = new WashingRec();
-        //Reccomendation is to cold wash 100% of clothes and air dry 100%
+        //High ambitious recommendation is to cold wash 100% of clothes and air dry 100%
+        //Moderate ambitious recommendation is to cold wash 80% of clothes and air dry 80%
         // if((coldwashPercent*1.50)<100){//if user isnt currently at the recomended % of cold washesif its possible to wash 50% more on cold
         if (coldwashPercent < 100) {//if user isnt currently at the recomended % of cold washes
-            //reccomend cold washing more
+            //recommend cold washing more
+            if(footprint.getAmbition().equalsIgnoreCase("High")){
+                wr.setColdWashSuggestion("We recommend you do all your laundry on a cold wash by doing so you could save"+String.valueOf(coldwashT)+"t of CO2 annually");
+            }else if (coldwashPercent < 80){
+
+                wr.setColdWashSuggestion("We recommend you do 80% your laundry on a cold wash by doing so you could save"+String.valueOf(coldwashT*.8)+"t of CO2 annually");
+            }else{
+                //user has moderate ambition and is already cloding washing between 80-99% of their clothes
+            }
             wr.setColdWash(true);
             wr.setColdWashTSaved(coldwashT);
         }
 
         if (airDryPercent < 100) {
             //reccomend airdry more
+            if(footprint.getAmbition().equalsIgnoreCase("High")){
+                wr.setColdWashSuggestion("We recommend you do all your laundry on a cold wash by doing so you could save"+String.valueOf(coldwashT)+"t of CO2 annually");
+            }else if (airDryPercent < 80){
+
+                wr.setColdWashSuggestion("We recommend you do 80% your laundry on a cold wash by doing so you could save"+String.valueOf(coldwashT*.8)+"t of CO2 annually");
+            }else{
+                //user has moderate ambition and is already airdrying between 80-99% of their clothes
+            }
             wr.setAirDry(true);
             wr.setAirDryTSaved(airDryT);
         }
@@ -586,22 +600,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         recTitle = view.findViewById(R.id.recommendationTitle);
         recParagraph = view.findViewById(R.id.recommendationParagraph);
         big3Layout = view.findViewById(R.id.big3Layout);
-        recLevelButton = view.findViewById(R.id.recLevelButton);
-        recLevelButton.setOnClickListener(new View.OnClickListener() {
-                                              @Override
-                                              public void onClick(View view) {
-                                                  //todo reset the recommendations paragraphs
-                                                  //move this to the footprint db
-                                                  if (level.equalsIgnoreCase("Serious")) {
-                                                      level = "Conservative";
-                                                      recLevelButton.setText("Recomendations: Conservative");
-                                                  } else {
-                                                      level = "Serious";
-                                                      recLevelButton.setText("Recomendations:Serious");
-                                                  }
-                                              }
-                                          }
-        );
+        
     }
 
 
@@ -840,8 +839,8 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     }
 
-    private boolean serious() {
-        return level.equalsIgnoreCase("Serious");
+    private boolean ambitious(Footprint f) {
+        return f.getAmbition().equalsIgnoreCase("High");
     }
 
     public double convertPoundToTon(double pound) {
@@ -863,6 +862,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     }
 
     public boolean biggestOfFive(double max, double val1, double val2, double val3, double val4) {
+        Log.i("12345", String.valueOf(max)+"|"+String.valueOf(val1)+"|"+String.valueOf(val2)+"|"+String.valueOf(val3)+"|"+String.valueOf(val4));
         return max > val1 && max > val2 && max > val3 && max > val4;
     }
 
@@ -896,12 +896,12 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                         if (returnFlight) {
                             newFootprint = newFootprint * 2;
                         }
-                        Log.i("!!!!!newFF", String.valueOf(newFootprint));
-                        Log.i("!!!!!newFF3", String.valueOf(newFlightFootprint));
+                       // Log.i("!!!!!newFF", String.valueOf(newFootprint));
+                       // Log.i("!!!!!newFF3", String.valueOf(newFlightFootprint));
 
                             newFlightFootprint=newFootprint;
                         latch.countDown();
-                        Log.i("!!!!!newFF4", String.valueOf(newFlightFootprint));//this is working
+                      //  Log.i("!!!!!newFF4", String.valueOf(newFlightFootprint));//this is working
                         //need to send this new footprint value to the getFlightRec method
                     } else {
 

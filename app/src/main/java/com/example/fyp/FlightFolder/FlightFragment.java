@@ -1,6 +1,7 @@
 package com.example.fyp.FlightFolder;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fyp.Footprint;
+import com.example.fyp.LatLngMap;
 import com.example.fyp.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -49,7 +51,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class FlightFragment extends Fragment implements AdapterView.OnItemSelectedListener {
@@ -71,6 +75,9 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
     private ArrayAdapter<CharSequence> classAdapter, returnAdapter;
     private LinearLayout addFlightLayout,recyclerLayout,totalLayout;
     private Boolean valid=false;
+    private LatLngMap latLngMap = new LatLngMap();
+    private Map locationMap;
+    private Location arriveLocation,departLocation;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     @Nullable
@@ -130,7 +137,9 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         airports = getResources().getStringArray(R.array.airports);
         addFlightLayout= view.findViewById(R.id.addFlightLayout);
         recyclerLayout= view.findViewById(R.id.recyclerLayout);
-       totalLayout= view.findViewById(R.id.totalFlightLayout);
+        totalLayout= view.findViewById(R.id.totalFlightLayout);
+        locationMap = latLngMap.getLocationMap();
+
 
         userHasFlights();//check if the user has any flights saved before setting the recyclerview visible
 
@@ -241,28 +250,12 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
                         //save the flight to the db
                         final String flightID = UUID.randomUUID().toString();//create a unique id for a flight
-                        Flight flight = new Flight(autoDepart.getText().toString().trim(), autoArrive.getText().toString().trim(), classSpinner.getSelectedItem().toString(), flightID, footprintInTonnes, getReturnFlight());
+                        Flight flight = new Flight(autoArrive.getText().toString().trim(),autoDepart.getText().toString().trim(), classSpinner.getSelectedItem().toString(), flightID,getDistance(getIATA(depart),getIATA(arrive)), footprintInTonnes, getReturnFlight());
                         mDatabase.child(firebaseAuth.getUid()).child("flights").child(flightID).setValue(flight);
                         updateUserTotalFootprint(flight.getFootprint());
                         valid=true;
-//                        getActivity().runOnUiThread(new Runnable() { // used to access ui thread so view can be updated
-//
-//                            @Override
-//                            public void run() {
-//
-//                                Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
-//                                addFlightLayout.setVisibility(View.GONE);
-//                                addFlightButton.setVisibility(View.VISIBLE);
-//                                autoDepart.setText("");
-//                                autoArrive.setText("");
-//
-//                            }
-//                        });
 
                         userHasFlights();
-                        //calculationValid=false;
-                        //reset autocompletes
-
 
                     } else {
 
@@ -303,6 +296,23 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         thread.start();
 
 
+    }
+
+    private String getDistance(String departIATA, String arriveIATA) {
+        String haul ="";
+        arriveLocation= (Location) locationMap.get(arriveIATA);
+        departLocation = (Location) locationMap.get(departIATA);
+
+       double distanceKM= (departLocation.distanceTo(arriveLocation))/1000;
+       if(distanceKM<=1500){
+           haul = "Short";
+       }else if(distanceKM>=4100){
+            haul = "Long";
+        }else{
+           haul = "Medium";
+       }
+
+       return haul;
     }
 
     private void userHasFlights() {

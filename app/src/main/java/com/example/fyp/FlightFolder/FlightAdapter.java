@@ -75,7 +75,7 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.MyViewHold
         holder.depart.setText(flight.getDepart());
         holder.flightClass.setText(flight.getFlightClass());
         holder.footprint.setText(String.valueOf(flight.getFootprint()+"t CO2"));
-        if(flight.getReturnFlight()){
+        if(flight.isReturnFlight()){
             holder.arrowImage.setImageResource(R.drawable.ic_baseline_compare_arrows_24);
         }else{
 

@@ -2,7 +2,7 @@
 <com.emilsjolander.components.StickyScrollViewItems.StickyScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/green_background"
+    android:background="@drawable/light_background"
     android:id="@+id/flight_fragment">
 
     <LinearLayout
@@ -200,5 +200,6 @@
 
         </LinearLayout>
     </LinearLayout>
+
 
 </com.emilsjolander.components.StickyScrollViewItems.StickyScrollView>

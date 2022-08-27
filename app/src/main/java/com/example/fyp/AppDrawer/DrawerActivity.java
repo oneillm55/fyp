@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.fyp.AmbitionFragment;
 import com.example.fyp.FlightFolder.FlightFragment;
 import com.example.fyp.FoodFolder.FoodFragment;
 import com.example.fyp.GlideApp;
@@ -97,7 +98,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
                         storageReference = FirebaseStorage.getInstance().getReference().child("images").child(user.getImageID());
 
 
-                        GlideApp.with(DrawerActivity.this).load(storageReference).apply(new RequestOptions().override(200, 200)).into(profileImage);
+                        GlideApp.with(getApplicationContext()).load(storageReference).apply(new RequestOptions().override(200, 200)).into(profileImage);
                     }
 
 
@@ -181,7 +182,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
                         new FlightFragment()).commit();
             case R.id.nav_pledge:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new FlightFragment()).commit();
+                        new AmbitionFragment()).commit();
                 break;
 
         }

@@ -3,7 +3,7 @@ package com.example.fyp.RecommendationsFolder.ClothingRecs;
 public class WashingRec {
     boolean coldWash,airDry;
     double coldWashTSaved, airDryTSaved;
-
+    String coldWashSuggestion, airDrySuggestion;
     public WashingRec() {
     }
 
@@ -44,6 +44,22 @@ public class WashingRec {
 
     public void setAirDryTSaved(double airDryTSaved) {
         this.airDryTSaved = airDryTSaved;
+    }
+
+    public String getColdWashSuggestion() {
+        return coldWashSuggestion;
+    }
+
+    public void setColdWashSuggestion(String coldWashSuggestion) {
+        this.coldWashSuggestion = coldWashSuggestion;
+    }
+
+    public String getAirDrySuggestion() {
+        return airDrySuggestion;
+    }
+
+    public void setAirDrySuggestion(String airDrySuggestion) {
+        this.airDrySuggestion = airDrySuggestion;
     }
 
     public double getTotalWashingTSaved() {

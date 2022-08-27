@@ -5,14 +5,16 @@ public class Flight {
     private String Depart;
     private String flightClass;
     private String flightID;
+    private String distance;
     private double footprint;
     private boolean returnFlight;
 
-    public Flight(String arrive, String depart, String flightClass, String flightID, double footprint, boolean returnFlight) {
+    public Flight(String arrive, String depart, String flightClass, String flightID, String distance, double footprint, boolean returnFlight) {
         Arrive = arrive;
         Depart = depart;
         this.flightClass = flightClass;
         this.flightID = flightID;
+        this.distance = distance;
         this.footprint = footprint;
         this.returnFlight = returnFlight;
     }
@@ -52,13 +54,6 @@ public class Flight {
         this.footprint = footprint;
     }
 
-    public boolean getReturnFlight() {
-        return returnFlight;
-    }
-
-    public void setReturnFlight(boolean returnFlight) {
-        this.returnFlight = returnFlight;
-    }
 
     public String getFlightID() {
         return flightID;
@@ -68,4 +63,19 @@ public class Flight {
         this.flightID = flightID;
     }
 
+    public boolean isReturnFlight() {
+        return returnFlight;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
+
+    public void setReturnFlight(boolean returnFlight) {
+        this.returnFlight = returnFlight;
+    }
 }

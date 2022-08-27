@@ -4,12 +4,13 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fadeScrollbars="false"
-    android:background="@drawable/green_background">
+    android:background="@drawable/light_background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -54,6 +55,18 @@
                 android:layout_height="2dp"
                 android:background="#028A4F"/>
     </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:visibility="invisible"/>
     <TextView
         android:id="@+id/editTextMeat"
         android:layout_width="match_parent"
@@ -157,6 +170,7 @@
         android:text="Save"
         android:minHeight="60dp"/>
 
+</LinearLayout>
 </LinearLayout>
 
     </com.emilsjolander.components.StickyScrollViewItems.StickyScrollView>
