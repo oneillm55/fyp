@@ -18,7 +18,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="0.0 Total CO2"
-            android:textSize="30dp" />
+            android:textSize="30dp"
+            android:visibility="gone"/>
 
         <LinearLayout
             android:id="@+id/big3Layout"
@@ -80,6 +81,14 @@
                 android:id="@+id/pieChart"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
+            <TextView
+                android:id="@+id/clickPCTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:text="Click on the pie chart sections to view your recommendations"
+                android:textSize="12dp"
+                android:textStyle="italic" />
 
             <LinearLayout
                 android:id="@+id/pieChartLegend"
@@ -175,6 +184,29 @@
 
     </LinearLayout>
         <LinearLayout
+            android:id="@+id/flightPieChartLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:visibility="gone">
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/flightPieChart"
+                android:layout_width="250dp"
+                android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
+            <TextView
+                android:id="@+id/flightPieChartLabel"
+                android:layout_width="150dp"
+                android:layout_height="300dp"
+                android:textAlignment="center"
+                android:text="The impact of your flights broken down"
+                android:textSize="25dp"/>
+
+
+            <TextView
+                style="@style/border1"/>
+        </LinearLayout>
+        <LinearLayout
             android:id="@+id/foodPieChartLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -193,6 +225,30 @@
                 android:id="@+id/foodPieChart"
                 android:layout_width="250dp"
                 android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
+
+
+            <TextView
+                style="@style/border1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/clothingPieChartLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:visibility="gone">
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/clothingPieChart"
+                android:layout_width="250dp"
+                android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
+            <TextView
+                android:id="@+id/clothingPieChartLabel"
+                android:layout_width="150dp"
+                android:layout_height="300dp"
+                android:textAlignment="center"
+                android:text="The impact of your clothing consumption broken down"
+                android:textSize="25dp"/>
 
 
             <TextView

@@ -13,8 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FYP">
         <activity
+            android:name=".SplashActivity"
+            android:exported="true" />
+        <activity
             android:name=".AppDrawer.DrawerActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,9 +30,6 @@
         </activity>
         <activity
             android:name=".RegistrationFolder.SignupActivity"
-            android:exported="true" />
-        <activity
-            android:name=".UserFolder.UserDetailsActivity"
             android:exported="true" />
     </application>
 

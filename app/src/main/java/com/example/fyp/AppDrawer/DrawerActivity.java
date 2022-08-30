@@ -177,10 +177,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new UserFragment()).commit();
                 break;
-            case R.id.nav_groups:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new FlightFragment()).commit();
-            case R.id.nav_pledge:
+            case R.id.nav_ambition:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new AmbitionFragment()).commit();
                 break;

@@ -18,38 +18,42 @@
             android:tag="sticky"
             android:background="@drawable/green_background_secondary">
 
-            <ImageView
-                android:id="@+id/flightIcon"
-                android:layout_width="408dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginTop="10dp"
-                android:src="@drawable/ic_baseline_flight_24" />
-
             <LinearLayout
                 android:id="@+id/totalFlightLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:visibility="gone">
+                android:weightSum="4">
+
+                <ImageView
+                    android:id="@+id/flightIcon"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_baseline_flight_24"
+                    android:layout_weight="1"/>
 
                 <TextView
                     android:id="@+id/flightFootprint"
-                    android:layout_width="320dp"
-                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
                     android:text="XXXXX"
                     android:textColor="@color/black"
                     android:textSize="20dp"
-                    android:textAlignment="center"/>
+                    android:textAlignment="center"
+                    android:paddingTop="5dp"
+                    android:layout_weight="2"/>
 
                 <ImageView
                     android:id="@+id/flightSourceImage"
-                    android:layout_width="100dp"
-                    android:layout_height="50dp"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:paddingTop="5dp"
                     android:src="@drawable/go_climate"
                     android:paddingRight="8dp"
-                    android:paddingBottom="8dp"/>
+                    android:paddingBottom="8dp"
+                    android:layout_weight="1"/>
             </LinearLayout>
             <TextView
                 android:layout_width="match_parent"

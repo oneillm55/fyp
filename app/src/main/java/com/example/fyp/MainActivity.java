@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         firebaseUser =firebaseAuth.getCurrentUser();
 
         if(firebaseUser!=null){
-            startActivity(new Intent(MainActivity.this, DrawerActivity.class));
+            startActivity(new Intent(MainActivity.this, SplashActivity.class));
         }
         setContentView(R.layout.activity_main);
         email = findViewById(R.id.editTextEmail);
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
                             if(task.isSuccessful()){
                                 // checkVerification();
-                                Intent intent = new Intent(MainActivity.this, DrawerActivity.class);
+                                Intent intent = new Intent(MainActivity.this, SplashActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);//prevents user being able to press back button to return to login screen
                                 startActivity(intent);
 

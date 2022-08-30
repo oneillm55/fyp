@@ -264,7 +264,8 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                         Log.e("Resonse message: ", String.valueOf(conn.getResponseMessage()));
                         valid=false;
                     }
-                    getActivity().runOnUiThread(new Runnable() { // used to access ui thread so view can be updated
+                    if(getActivity() != null){
+                        getActivity().runOnUiThread(new Runnable() { // used to access ui thread so view can be updated
 
                             @Override
                             public void run() {
@@ -284,6 +285,8 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
                             }
                         });
+                    }
+
 
                     conn.disconnect();
 
