@@ -178,7 +178,7 @@
             android:layout_height="wrap_content"
             android:textSize="20dp"
             android:textStyle="italic"
-            android:text="Log all your flights form the past year here"/>
+            android:text="Log all your flights from the past year here"/>
         <TextView
             style="@style/border2"/>
 
@@ -200,7 +200,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="40dp"
+                android:textSize="30dp"
                 android:text="Your Flights"/>
 
             <androidx.recyclerview.widget.RecyclerView

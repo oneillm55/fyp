@@ -60,7 +60,7 @@
                 android:id="@+id/rec2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="  Your Clothing, Food and Flight data can be inut via the the drawer on the left!\n\n Check back here after each step to see your personalised report on where your carbon footprint is coming from and how can help reduce it! \n\n   NOTE: All of these recommendations are based on how ambitious you are about improving your CO2 output, you can adjust this in the Ambition section of the app. "
+                android:text="  Your Clothing, Food and Flight data can be input via the the drawer on the left!\n\n Check back here after each step to see your personalised report on where your carbon footprint is coming from and how can help reduce it! \n\n NOTE: All of these recommendations are based on how ambitious you are about improving your CO2 output, you can adjust this in the Ambition section of the app. "
                 android:textSize="20dp" />
             <TextView
                 android:id="@+id/rec3Title"
@@ -218,7 +218,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Ireland are the 3rd worst performing member of the EU in Carbon footprint per person\n The recommendation from the experts is the try and get out footprint to 5t\n Start inputting your data now and comeback to see how you fair against this graph"
+                android:text="Ireland are the 3rd worst performing member of the EU in Carbon footprint per person\nThe recommendation from the experts is the try and get our footprint to 5t\nStart inputting your data now and comeback to see how you fair against this graph"
                 android:textSize="15dp" />
             <TextView
                 style="@style/border1"/>
