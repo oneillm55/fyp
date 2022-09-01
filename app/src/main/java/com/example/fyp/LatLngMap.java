@@ -17,10 +17,10 @@ public class LatLngMap {
         ath.setLongitude(23.948415599);
         locationMap.put("ATH",ath  );
 
-        Location bcr = new Location("BCR");
-        bcr. setLatitude(-19.0119438171);
-        bcr.setLongitude(-57.6713905334);
-        locationMap.put("BCR",bcr );
+        Location bcn = new Location("BCN");
+        bcn. setLatitude(41.2971);
+        bcn.setLongitude(2.07846);
+        locationMap.put("BCN",bcn );
 
         Location dub = new Location("DUB");
         dub. setLatitude(53.421299);

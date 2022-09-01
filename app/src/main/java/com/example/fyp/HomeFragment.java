@@ -57,8 +57,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -70,14 +68,13 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     private PieChart pieChart, foodPieChart,flightPieChart,clothingPieChart;
     private BarChart barChart;
     private FirebaseAuth firebaseAuth;
-    private DatabaseReference mDatabase, footprintReference;
+    private DatabaseReference mDatabase;
     private double foodCO2, flightCO2, clothingCO2, totalCO2, newFlightFootprint,meatCO2, shoppingCO2, dairyCO2, compostCO2,organicCO2 ;
-    private TextView totalCO2TextView, recTitle, recParagraph, barChartTitle, clickPCTextView;
+    private TextView totalCO2TextView, recTitle, recParagraph, barChartTitle, clickPCTextView,flightRecParagraph,foodRecParagraph,clothingRecParagraph,barchartParagraph;
     private LinearLayout pieChartLayout,foodPieChartLayout,flightPieChartLayout,clothingPieChartLayout, barChartLayout, recLayout, big3Layout;
     private boolean userHasData;
     private ArrayList<Integer> colors,pieChartColors,flightChartColors,clothingChartColors;
-    private String userID, clothingRecContent="", foodRecContent="", flightRecContent="", goClimateApiKey;
-    private String level="Conservative";
+    private String userID, clothingRecContent="", foodRecContent="", flightRecContent="",clothingContent="", foodContent="", flightContent="", goClimateApiKey;
     Footprint userFootprint = new Footprint();
     CountDownLatch latch = new CountDownLatch(1);
 
@@ -100,6 +97,8 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         readData(new FirebaseCallback() {
             @Override
             public void onCallBack(Footprint footprint) {
+
+                hideDefaultViews();
                 loadFootprintViews(footprint);
             }
 
@@ -175,6 +174,10 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     }
 
+    private void hideDefaultViews() {
+        big3Layout.setVisibility(View.GONE);
+    }
+
     private void loadFlightViews(List<Flight> flightList,Footprint footprint) {
         FlightClassRec flightClassRec = getFlightClassRec(flightList);
         FlightDistanceRec shortFlightRec = getFlightRec(flightList,"Short");
@@ -182,6 +185,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         FlightDistanceRec longFlightRec = getFlightRec(flightList,"Long");
 
         setFlightRec(flightList,flightClassRec,shortFlightRec,mediumFlightRec,longFlightRec,footprint);
+        flightRecParagraph.setText(flightRecContent);
         loadFlightPieChartData(shortFlightRec,mediumFlightRec,longFlightRec);
         setUpFlightPieChart(footprint);
     }
@@ -239,7 +243,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 count++;
             }
         }
-        //calculate the amount of all flights is made up by short flights and update the recomendation
         flightRec.setCount(count);
         flightRec.setCost(flightTotal);
         flightRec.setTSavedAmbitious(currentTotal-flightTotal);
@@ -250,100 +253,102 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     private void setFlightRec(List<Flight> flightList, FlightClassRec flightClassRec,FlightDistanceRec shortFlightRec,FlightDistanceRec mediumFlightRec,FlightDistanceRec longFlightRec,Footprint footprint) {
         Log.i("sml dif", String.valueOf(shortFlightRec.getPercent())+"|"+String.valueOf(mediumFlightRec.getPercent())+"|"+String.valueOf(longFlightRec.getPercent()));
         if(flightClassRec.getTSaved()>0) {
-            //Flight class is always shown if applicable to the user
-            flightRecContent = "By flying economy on all your flights you would save " + String.valueOf(round(flightClassRec.getTSaved())+"t of CO2.\nConsider this a little less comfort for a lot less carbon.");
+            //Flight class recommendation is always shown if applicable to the user
+            flightRecContent = "-By flying economy on all your flights you would save " + String.valueOf(round(flightClassRec.getTSaved())+"t of CO2.\nConsider this a little less comfort for a lot less carbon.\n");
         }
 
         if(biggestOfThree(shortFlightRec.getPercent(),mediumFlightRec.getPercent(),longFlightRec.getPercent())){
-            //save most by cutting out short flights
-            flightRecContent +=getFlightPercentString("Short",shortFlightRec);
-            if(shortFlightRec.getCount()==1 || ambitious(footprint)){
-                    flightRecContent +="\nCommit to cutting out these flights and save"+shortFlightRec.getCost()+"t of CO2, \n"+round(shortFlightRec.getCost()/footprint.getFlight())*100+"% of your total flight footprint!";
-                flightRecContent += getVegetarianStringMonths(round((shortFlightRec.getCost()/0.0275)));
-            }else{
-                //user is not ambitious and has more than one short haul flight
-                flightRecContent +="\nBy reducing your short haul flights by 50% you could cut out"+shortFlightRec.getCost()*.5+"t of CO2, \n"+round((shortFlightRec.getCost()*.5)/footprint.getFlight())*100+"% of your total flight footprint!";
-                flightRecContent += getVegetarianStringMonths(round((shortFlightRec.getCost()*.5)/0.0275));
-            }
+
+            reduceShortHaul(shortFlightRec,footprint);
 
         }else if (biggestOfThree(mediumFlightRec.getPercent(),shortFlightRec.getPercent(),longFlightRec.getPercent())){
-            //save most by cutting out medium flights
-            flightRecContent +=getFlightPercentString("Medium",mediumFlightRec);
-            if(mediumFlightRec.getCount()==1 || ambitious(footprint)){
-                flightRecContent +="\nCommit to cutting out these flights and save"+mediumFlightRec.getCost()+"t of CO2, \n"+round(mediumFlightRec.getCost()/footprint.getFlight())*100+"% of your total flight footprint!";
-                flightRecContent += getVegetarianStringMonths(round((mediumFlightRec.getCost()/0.0275)));
-            }else{
-                //user is not ambitious and has more than one short haul flight
-                flightRecContent +="\nBy reducing your medium haul flights by 50% you could cut out"+mediumFlightRec.getCost()*.5+"t of CO2, \n"+round((mediumFlightRec.getCost()*.5)/footprint.getFlight())*100+"% of your total flight footprint!";
-                flightRecContent += getVegetarianStringMonths(round((mediumFlightRec.getCost()*.5)/0.0275));
-            }
+            reduceMediumHaul(mediumFlightRec,footprint);
 
         }else if (biggestOfThree(longFlightRec.getPercent(),shortFlightRec.getPercent(),mediumFlightRec.getPercent())){
-            //save most by cutting out long flights
-            flightRecContent +=getFlightPercentString("Long",longFlightRec);
-            if(longFlightRec.getCount()==1 || ambitious(footprint)){
-                flightRecContent +="\nCommit to cutting out these flights and save"+longFlightRec.getCost()+"t of CO2, \n"+round(longFlightRec.getCost()/footprint.getFlight())*100+"% of your total flight footprint!";
-                flightRecContent += getVegetarianStringYears(round(longFlightRec.getCost()/0.33));
-            }else{
-                //user is not ambitious and has more than one short haul flight
-                flightRecContent +="\nBy reducing your long haul flights by 50% you could cut out"+longFlightRec.getCost()*.5+"t of CO2, \n"+round((longFlightRec.getCost()*.5)/footprint.getFlight())*100+"% of your total flight footprint!";
-                flightRecContent += getVegetarianStringYears(round((longFlightRec.getCost()*.5)/0.33));
-            }
+            reduceLongHaul(longFlightRec,footprint);
 
         }else{
-            //two or more values are equal therefore make general recommendation todo
-            if(shortFlightRec.getCost()>0){
-                flightRecContent +=getFlightPercentString("Short",shortFlightRec);
-            }
-
-            if(mediumFlightRec.getCost()>0){
-                flightRecContent +=getFlightPercentString("Medium",mediumFlightRec);
-            }
+            //in general long haul flights produce more than medium produce more than short so in the rare event two or more distance values are equal this is a safe recommendation
             if(longFlightRec.getCost()>0){
-                flightRecContent +=getFlightPercentString("Long",longFlightRec);
+                reduceLongHaul(longFlightRec,footprint);
+            }else if(mediumFlightRec.getCost()>0){
+
+                reduceMediumHaul(mediumFlightRec,footprint);
+            }else{
+                reduceShortHaul(shortFlightRec,footprint);
             }
 
-            flightRecContent +="\nConsider going flightless to help the planet";
 
 
+        }
+    }
+
+    private void reduceShortHaul(FlightDistanceRec shortFlightRec, Footprint footprint) {
+        flightContent +=getFlightPercentString("Short",shortFlightRec);
+        if(shortFlightRec.getCount()==1 || ambitious(footprint)){
+            flightRecContent +="-Commit to cutting out short haul flights and save "+round(shortFlightRec.getCost())+"t of CO2, "+round(shortFlightRec.getCost()/footprint.getFlight())*100+"% of your total flight footprint!\n";
+            flightRecContent += getVegetarianStringMonths(round((shortFlightRec.getCost()/0.0275)));
+        }else{
+            //user is not ambitious and has more than one short haul flight
+            flightRecContent +="-By reducing your short haul flights by 50% you could cut out "+round(shortFlightRec.getCost()*.5)+"t of CO2, "+round((shortFlightRec.getCost()*.5)/footprint.getFlight())*100+"% of your total flight footprint!\n";
+            flightRecContent += getVegetarianStringMonths(round((shortFlightRec.getCost()*.5)/0.0275));
+        }
+    }
+
+    private void reduceMediumHaul(FlightDistanceRec mediumFlightRec, Footprint footprint) {
+        flightContent +=getFlightPercentString("Medium",mediumFlightRec);
+        if(mediumFlightRec.getCount()==1 || ambitious(footprint)){
+            flightRecContent +="-Commit to cutting out medium haul flights and save "+round(mediumFlightRec.getCost())+"t of CO2, "+round(mediumFlightRec.getCost()/footprint.getFlight())*100+"% of your total flight footprint!\n";
+            flightRecContent += getVegetarianStringMonths(round((mediumFlightRec.getCost()/0.0275)));
+        }else{
+            //user is not ambitious and has more than one short medium flight
+            flightRecContent +="-By reducing your medium haul flights by 50% you could cut out "+round(mediumFlightRec.getCost()*.5)+"t of CO2, "+round((mediumFlightRec.getCost()*.5)/footprint.getFlight())*100+"% of your total flight footprint!\n";
+            flightRecContent += getVegetarianStringMonths(round((mediumFlightRec.getCost()*.5)/0.0275));
+        }
+    }
+
+    private void reduceLongHaul(FlightDistanceRec longFlightRec, Footprint footprint) {
+        flightContent +=getFlightPercentString("Long",longFlightRec);
+        if(longFlightRec.getCount()==1 || ambitious(footprint)){
+            flightRecContent +="-Commit to cutting out long haul flights and save "+round(longFlightRec.getCost())+"t of CO2, "+round(longFlightRec.getCost()/footprint.getFlight())*100+"% of your total flight footprint!\n";
+            flightRecContent += getVegetarianStringYears(round(longFlightRec.getCost()/0.33));
+        }else{
+            //user is not ambitious and has more than one long haul flight
+            flightRecContent +="-By reducing your long haul flights by 50% you could cut out "+round(longFlightRec.getCost()*.5)+"t of CO2, "+round((longFlightRec.getCost()*.5)/footprint.getFlight())*100+"% of your total flight footprint!\n";
+            flightRecContent += getVegetarianStringYears(round((longFlightRec.getCost()*.5)/0.33));
         }
     }
 
     private String getFlightPercentString(String string, FlightDistanceRec flightRec) {
-        return "\n"+string+" haul flights make up "+round(flightRec.getPercent())+"% of all your flights footprint and produce "+round(flightRec.getCost())+"t of CO2!";
+        return string+" haul flights make up "+round(flightRec.getPercent())+"% of your flight footprint and produce "+round(flightRec.getCost())+"t of CO2!\n";
     }
 
     private String getVegetarianStringYears(double d){
-        return "\nThat would save as much carbon as a meat eater going vegetarian for"+d+" years!";
+        return "That would save as much carbon as a meat eater going vegetarian for "+d+" years!";
 
     }
 
     private String getVegetarianStringMonths(double d){
-        return "\nThat would save as much carbon as a meat eater going vegetarian for"+d+" months!";
+        return "That would save as much carbon as a meat eater going vegetarian for "+d+" months!";
 
     }
 
     private FlightClassRec getFlightClassRec(List<Flight> flightList) {
         FlightClassRec fcr = new FlightClassRec();
-        //take the flight class loop it for every flight check class if not economy, calculate cost of flight if economy and add it to a new list then get the total flight cost for the new list vs old
         double newTotal=0;//stores the new flight total if the user took all their flights economy
         double currentTotal=0;// the users current flight footprint
        for(Flight flight : flightList){
            currentTotal+=flight.getFootprint();//get the current total footprint of all flights
            if(flight.getFlightClass().trim().equalsIgnoreCase("Economy")){
-               //add flight co2 to the new list
                newTotal+=flight.getFootprint();
            }else{
-               //flight is business or first class therefore get its potention co2 if it were economy
                getNewFlightFootprint(flight.getDepart(), flight.getArrive(), flight.isReturnFlight());//this will set newFlight footprint to be the value of the current flight if flown economy
-               //use new flight footprint value
                try {
                    latch.await();//wait for newFlightFootprint to be assigned
                } catch (InterruptedException e) {
                    e.printStackTrace();
                }
                newTotal+=newFlightFootprint;
-                 Log.i("!!!!!newFF", String.valueOf(newFlightFootprint));
                newFlightFootprint=0;
            };
 
@@ -371,7 +376,9 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         OrganicRec organicRec = getOrganicRec(food,footprint);
 
         setFoodRec(food, meatRec, dairyRec, shoppingRec, compostRec, organicRec);
+        foodRecParagraph.setText(foodRecContent);
     }
+
 
     private void loadFoodPieChartData() {
         ArrayList<PieEntry> entries = new ArrayList<>();
@@ -402,7 +409,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         foodPieChart.setDrawEntryLabels(true);
         foodPieChart.setEntryLabelTextSize(12);
         foodPieChart.setEntryLabelColor(Color.BLACK);
-        foodPieChart.setCenterText("Food\n"+footprint.getFood()+"t");
+        foodPieChart.setCenterText("Food\n"+round(footprint.getFood())+"t");
         foodPieChart.setCenterTextSize(20);
         foodPieChart.getDescription().setEnabled(false);
         foodPieChart.setDrawEntryLabels(false);
@@ -420,20 +427,48 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     private void setFoodRec(Food food, MeatRec meatRec, DairyRec dairyRec, ShoppingRec shoppingRec, CompostRec compostRec, OrganicRec organicRec) {
         //set the values on the homepage with the recomendations that correspond to the passed parameters
         double meat = meatRec.getTSaved(), dairy = dairyRec.getTSaved(), shopping = shoppingRec.getTSaved(), compost = compostRec.getTSaved(), organic = organicRec.getTSaved();
-        if (biggestOfFive(meat, dairy, shopping, compost, organic)) {
-            foodRecContent="Biggest saving= meat\n Save"+ round(meat)+meatRec.getSuggestion();
+        if (biggestOfFive(meat, dairy, shopping, compost, organic)) {;
+            foodContent=getFoodContent("Meat",round(food.getMeatValue()));
+            foodRecContent=getFoodRecContent("Meat",meatRec.getSuggestion(),round(meat));
         } else if (biggestOfFive(dairy, shopping, compost, organic, meat)) {
-            foodRecContent="Biggest saving= dairy\n Save"+ round(dairy) + dairyRec.getSuggestion();
+            foodContent=getFoodContent("Dairy",round(food.getDairyValue()));
+            foodRecContent=getFoodRecContent("Dairy",dairyRec.getSuggestion(),round(dairy));
         } else if (biggestOfFive(shopping, compost, organic, meat, dairy)) {
-            foodRecContent="Biggest saving= shopping\n Save"+ round(shopping)+ shoppingRec.getSuggestion();
+            foodContent=getFoodContent("Shopping",round(food.getShoppingValue()));
+            foodRecContent=getFoodRecContent("Shopping",shoppingRec.getSuggestion(),round(shopping));
         } else if (biggestOfFive(compost, organic, meat, dairy, shopping)) {
-            foodRecContent="Biggest saving= compost\n Save"+ round(compost)+ compostRec.getSuggestion();
+            foodContent=getFoodContent("Not composting",round(food.getCompostValue()));
+            foodRecContent="By composting your food you could save"+ round(compost)+"t of CO2";
         } else if(biggestOfFive(organic, meat, dairy, shopping,compost)) {
-            foodRecContent="Biggest saving= organic\n Save"+ round(organic)+ organicRec.getSuggestion();
+            foodContent=getFoodContent("Not eating enough organic food",round(food.getOrganicValue()));
+            foodRecContent="By changing the amount of organic food you eat to \""+organicRec.getSuggestion()+"\"you could save"+ round(organic)+"t of CO2";
         }else{
-                //two values are equal
-            //get the two equal values and display the recomendation for the one with the larger overall output
+                //two values are equal therefore display recommendations based on general order of the largest CO2 contributors
+            if (meat>0) {;
+                foodContent=getFoodContent("Meat",round(food.getMeatValue()));
+                foodRecContent=getFoodRecContent("Meat",meatRec.getSuggestion(),round(meat));
+            }  else if (shopping>0) {
+                foodContent=getFoodContent("Shopping",round(food.getShoppingValue()));
+                foodRecContent=getFoodRecContent("Shopping",shoppingRec.getSuggestion(),round(shopping));
+            } else if (dairy>0) {
+                foodContent=getFoodContent("Dairy",round(food.getDairyValue()));
+                foodRecContent=getFoodRecContent("Dairy",dairyRec.getSuggestion(),round(dairy));
+            }else if (compost>0) {
+                foodContent=getFoodContent("Not composting",round(food.getCompostValue()));
+                foodRecContent="By composting your food you could save"+ round(compost)+"t of CO2";
+            } else {
+                foodContent=getFoodContent("Not eating enough organic food",round(food.getOrganicValue()));
+                foodRecContent="By changing the amount of organic food you eat to \""+organicRec.getSuggestion()+"\"you could save"+ round(organic)+"t of CO2";;
+            }
         }
+    }
+
+    private String getFoodRecContent(String string,String suggestion, double value) {
+        return "By reducing your "+string+" consumption to:\""+suggestion+"\" you could save "+ value+"t of CO2";
+    }
+
+    private String getFoodContent(String string, double value) {
+        return string+" is the biggest contributor to your food footprint producing "+ value+"t of CO2";
     }
 
     private OrganicRec getOrganicRec(Food food, Footprint footprint) {
@@ -450,7 +485,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 suggestion = "Most";
                 break;
             case "None":
-                // value = value + .06;
                 if ((ambitious(footprint))) {
                     //most
                     organicTSaved = organicValue - 0.15;
@@ -532,10 +566,8 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             case "Never":
                 break;
             case "Occasionally":
-                //value = value + .04;
                 break;
             case "Every day":
-                //value = value + .07;
                 if ((ambitious(footprint))) {
                     dairyTSaved = dairyValue;
                     suggestion = "Never";
@@ -560,13 +592,11 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             case "Never":
                 break;
             case "Occasionally":
-                //user already eats meat rarely, maybe consider cutting it out all together
                 meatTSaved = meatValue;
                 suggestion = "Never";
 
                 break;
             case "Once a day":
-                //user is eating meat once a day if they are serious they might consider removing meat from diet else recomend occasionally
                 if ((ambitious(footprint))) {
                     meatTSaved = meatValue;
                     suggestion = "Never";
@@ -577,7 +607,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 }
                 break;
             case "Most meals":
-                //if you ate once a day instead
                 if ((ambitious(footprint))) {
 
                     meatTSaved = meatValue - .08;
@@ -599,6 +628,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         ReturnClothingRec returnClothingRec = getReturnClothingRec(clothing);
 
         setClothingRec(washingRec, purchasingRec, returnClothingRec, clothing,footprint);
+        clothingRecParagraph.setText(clothingRecContent);
         loadClothingPieChartData(clothing);
         setUpClothingPieChart(footprint);
     }
@@ -647,49 +677,64 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         double washing = washingRec.getTotalWashingTSaved(), purchasing = purchasingRec.getTotalPurchasingTSaved(), returnClothing = returnClothingRec.getTotalReturnTSaved();
         if (biggestOfThree(washing, purchasing, returnClothing)) {
 
-            clothingRecContent = "Your clothes washing habits are the biggest factor in your clothing footprint, we recommend: ";
+            double saved=0;
+            clothingContent = "Your clothes washing habits are the biggest factor in your clothing footprint producing "+round(clothing.getAirDryT()+clothing.getColdWashT())+ "t of CO2\n";
             if (washingRec.isAirDry()) {
                 if(ambitious(footprint)){
-                    clothingRecContent += "\n-Air drying all your laundry, saving " + round(washingRec.getAirDryTSaved()) + "t of CO2";
+                    clothingRecContent += "\n-By air drying all your laundry, you could save " + round(washingRec.getAirDryTSaved()) + "t of CO2\n";
+                    saved+=round(washingRec.getAirDryTSaved());
                 }else{
 
-                    clothingRecContent += "\n-Air drying 80% of your laundry, saving " + round(washingRec.getAirDryTSaved()*.8) + "t of CO2";
+                    clothingRecContent += "\n-By air drying 80% of your laundry, you could save  " + round(washingRec.getAirDryTSaved()*.8) + "t of CO2\n";
+                    saved+=round(washingRec.getAirDryTSaved()*.8);
                 }
             }
 
             if (washingRec.isColdWash()) {
                 if(ambitious(footprint)){
 
-                    clothingRecContent += "\n-Doing all your laundry on a cold wash, saving " + round(washingRec.getColdWashTSaved()) + "t of CO2";
+                    clothingRecContent += "\n-By doing all your laundry on a cold wash you would save" + round(washingRec.getColdWashTSaved()) + "t of CO2\n";
+                    saved+=round(washingRec.getAirDryTSaved());
                 }else{
 
-                    clothingRecContent += "\n-Doing 80% of your laundry on a cold wash, saving " + round(washingRec.getColdWashTSaved()*.8) + "t of CO2";
+                    clothingRecContent += "\n-By doing 80% of your laundry on a cold wash you would save " + round(washingRec.getColdWashTSaved()*.8) + "t of CO2\n";
+                    saved+=round(washingRec.getAirDryTSaved()*.8);
                 }
             }
+            clothingRecContent += getDubLonFlightsSaved(round(saved));
+
         } else if (biggestOfThree(purchasing, washing, returnClothing)) {
+            double saved = 0;
+            clothingContent = "The types of clothing yor buying(or not buying) are the biggest contributor to your clothing footprint producing "+round(clothing.getSustainableT()+clothing.getSecondHandT())+"t of CO2\n";
 
-            clothingRecContent = "The types of clothing yor buying(or not buying) are the biggest contributor to your clothing footprint, we recommend:";
-            if(ambitious(footprint)){
-
-                clothingRecContent += "\n-Purchasing 50% more of your clothes from sustainable brands " + round(purchasingRec.getSecondHandTSaved()) + "t of CO2";
-            }else{
-
-                clothingRecContent += "\n-Doing 80% of your laundry on a cold wash, saving " + round(washingRec.getColdWashTSaved()*.8) + "t of CO2";
+            if(purchasingRec.isSustainable()){
+                clothingRecContent += "\n-By purchasing 50% more of your clothes from sustainable brands you could save" + round(purchasingRec.getSecondHandTSaved()) + "t of CO2\n";
+                saved +=round(purchasingRec.getSecondHandTSaved());
             }
+
+            if(purchasingRec.isSecondHand()){
+                clothingRecContent += "\n-By purchasing 50% more of your clothes second hand you could save" + round(purchasingRec.getSecondHandTSaved()) + "t of CO2\n";
+                saved +=round(purchasingRec.getSecondHandTSaved());
+            }
+
+            clothingRecContent += getDubLonFlightsSaved(round(saved));
+
         } else if (biggestOfThree(returnClothing, washing, purchasing)) {
 
-            clothingRecContent = "By returning"+clothing.getReturnPercent()+"% of your clothes your generating"+round(clothing.getReturnT())+"t of CO2";
+            clothingContent = "By returning"+clothing.getReturnPercent()+"% of your clothes you're generating "+round(clothing.getReturnT())+"t of CO2\n";
             if(ambitious(footprint)){
-                clothingRecContent = "We recommend cutting out returns, saving " + String.valueOf(round(returnClothing))+"t of CO2";
+                if(returnClothingRec.isReturnClothing()){
+                    clothingRecContent += "If you didn't return any of your clothes you would save " + round(returnClothingRec.getReturnTSaved())+"t of CO2\n";
+                }
             }else{
-
-                clothingRecContent = "We recommend cutting down the amount of clothes you return by 50% , saving " + String.valueOf(round(returnClothing*.5))+"t of CO2";
+                if(returnClothingRec.isReturnClothing()) {
+                    clothingRecContent += "We recommend cutting down the amount of clothes you return by 50% , saving " + String.valueOf(round(returnClothing * .5)) + "t of CO2\n";
+                }
+                if(returnClothingRec.isReturnOnline()){
+                    clothingRecContent += "We recommend doing your returns online (rather than driving to the shop yourself) this would save " + round(returnClothingRec.getReturnTSaved())+"t of CO2\n";
+                }
             }
-            if(returnClothingRec.isReturnOnline()){
-                //amount user could save by doing 50% of their returns online
-                //note that its only if driving to the store
 
-            }
         } else {
             //two of the values are equal
             clothingRecContent = "You could benefit from changing more than one habit regarding your clothing consumption ";
@@ -697,36 +742,41 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
 
     }
 
+    private String getDubLonFlightsSaved(double saved) {
+        double amountOfDubLonFlights = 0.2/saved;
+        if(amountOfDubLonFlights>.5){
+
+            return "That's the equivalent of  "+round(amountOfDubLonFlights)+" flights from Dublin to London!";
+        }else {
+            return "";
+        }
+    }
+
     private WashingRec getWashingRec(Clothing clothing,Footprint footprint) {
 
         double airDryT = clothing.getAirDryT(), coldwashT = clothing.getColdWashT(), savedT = 0, coldwashPercent = clothing.getColdWashPercent(), airDryPercent = clothing.getAirDryPercent();
         WashingRec wr = new WashingRec();
-        //High ambitious recommendation is to cold wash 100% of clothes and air dry 100%
-        //Moderate ambitious recommendation is to cold wash 80% of clothes and air dry 80%
-        // if((coldwashPercent*1.50)<100){//if user isnt currently at the recomended % of cold washesif its possible to wash 50% more on cold
         if (coldwashPercent < 100) {//if user isnt currently at the recomended % of cold washes
-            //recommend cold washing more
             if(footprint.getAmbition().equalsIgnoreCase("High")){
                 wr.setColdWashSuggestion("We recommend you do all your laundry on a cold wash by doing so you could save"+String.valueOf(coldwashT)+"t of CO2 annually");
             }else if (coldwashPercent < 80){
 
                 wr.setColdWashSuggestion("We recommend you do 80% your laundry on a cold wash by doing so you could save"+String.valueOf(coldwashT*.8)+"t of CO2 annually");
             }else{
-                //user has moderate ambition and is already cloding washing between 80-99% of their clothes
+                //user has moderate ambition and is already cold washing between 80-99% of their clothes
             }
             wr.setColdWash(true);
             wr.setColdWashTSaved(coldwashT);
         }
 
         if (airDryPercent < 100) {
-            //recomend airdry more
             if(footprint.getAmbition().equalsIgnoreCase("High")){
                 wr.setColdWashSuggestion("We recommend you do all your laundry on a cold wash by doing so you could save"+String.valueOf(coldwashT)+"t of CO2 annually");
             }else if (airDryPercent < 80){
 
                 wr.setColdWashSuggestion("We recommend you do 80% your laundry on a cold wash by doing so you could save"+String.valueOf(coldwashT*.8)+"t of CO2 annually");
             }else{
-                //user has moderate ambition and is already airdrying between 80-99% of their clothes
+                //user has moderate ambition and is already air drying between 80-99% of their clothes
             }
             wr.setAirDry(true);
             wr.setAirDryTSaved(airDryT);
@@ -741,20 +791,16 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         PurchasingRec pr = new PurchasingRec();
         double secondHandT = clothing.getSecondHandT(), sustainableT = clothing.getSustainableT(), secondHandPercent = clothing.getSecondHandPercent(), sustainablePercent = clothing.getSustainablePercent();
 
-        //Reccomend purchase 50% sustainable and 50% more second hand
 
         if (sustainablePercent < 50) {
-            //reccomend sus more
             pr.setSustainable(true);
-            //the amount the user would save if they purchased 50% of their clothes sustainably
-            //sustaibableT = current cost of purchasing sustaiablePercent of clothes sustaiably
 
-            double costFifity = 0.063276084;//cost of a user purchasing 50% of their clothes sustaiably
-            double sustainableTSaved = sustainableT - costFifity; //difference between users current cost and the cost of them purchasing 50% sustainably ie their potential savings
+            double costFifty = 0.063276084;//cost of a user purchasing 50% of their clothes sustainably
+            double sustainableTSaved = sustainableT - costFifty; //difference between users current cost and the cost of them purchasing 50% sustainably ie their potential savings
             pr.setSustainableTSaved(sustainableTSaved);
         }
         if (secondHandPercent < (sustainablePercent * 1.50)) {//user can purchase 50% more second hand
-            //reccomend more second hand
+            //recommend more second hand
             double secondHandTSaved = secondHandT * .5;//amount they could save if they purchase 50% more second hand
             pr.setSecondHand(true);
             pr.setSecondHandTSaved(secondHandTSaved);
@@ -766,7 +812,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         ReturnClothingRec rcr = new ReturnClothingRec();
         double returnT = clothing.getReturnT(), returnOnlineT = clothing.getReturnT(), returnPercent = clothing.getReturnPercent(), returnOnlinePercent = clothing.getReturnOnlinePercent();
 
-        //recommend not returning any orders, if you are return them online
         if (returnPercent > 0) {
             rcr.setReturnClothing(true);
             rcr.setReturnTSaved(returnT);
@@ -786,11 +831,10 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         foodCO2 = footprint.getFood();
         totalCO2 = foodCO2 + flightCO2 + clothingCO2;
         totalCO2TextView.setText("Annual CO2 output:\n" + String.format("%.2f", totalCO2) + " Tonnes");
-        userFootprint = footprint;//doesnt do anything
         setUpPieChart(footprint);
         loadPieChartData();
         setUpBarChart();
-        loadBarChartData();
+        loadBarChartData(footprint);
     }
 
     @Override
@@ -825,9 +869,13 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         barChart = view.findViewById(R.id.barChart);
         barChartTitle = view.findViewById(R.id.barChartTitle);
         barChartLayout = view.findViewById(R.id.barChartLayout);
-        recLayout = view.findViewById(R.id.recommendationLayout);
+        recLayout = view.findViewById(R.id.recLayout);
         recTitle = view.findViewById(R.id.recommendationTitle);
         recParagraph = view.findViewById(R.id.recommendationParagraph);
+        flightRecParagraph = view.findViewById(R.id.flightRecommendationParagraph);
+        foodRecParagraph = view.findViewById(R.id.foodRecommendationParagraph);
+        clothingRecParagraph = view.findViewById(R.id.clothingRecommendationParagraph);
+        barchartParagraph = view.findViewById(R.id.barChartParagraph);
         big3Layout = view.findViewById(R.id.big3Layout);
         clickPCTextView = view.findViewById(R.id.clickPCTextView);
         
@@ -843,13 +891,14 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                     Footprint footprint = snapshot.getValue(Footprint.class);
                     userHasData=true;
                     firebaseCallback.onCallBack(footprint);
+                }else{
+                    loadDefaultViews();
                 }
 
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                //Toast.makeText(getContext(), "Db error", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -859,10 +908,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     Clothing clothing = snapshot.getValue(Clothing.class);
-                    //do whats required with user clothing
                     firebaseCallback.onCallBack(clothing);
-                } else {
-                    Log.i("in clothing", "Doesnt exist");
                 }
             }
 
@@ -896,7 +942,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         Flight flight = dataSnapshot.getValue(Flight.class);
                         flightList.add(flight);
-                        //do whats required with user flights
                     }
                     firebaseCallback.onCallBack(flightList);
                 }
@@ -908,7 +953,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             }
         });
 
-
     }
 
     private interface FirebaseCallback {
@@ -919,6 +963,15 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         void onCallBack(List<Flight> flightList);
 
         void onCallBack(Food food);
+    }
+
+    private void loadDefaultViews() {
+
+        big3Layout.setVisibility(View.VISIBLE);
+        setUpBarChart();
+        Footprint footprint = new Footprint();
+        loadBarChartData(footprint);
+
     }
 
     private void setUpBarChart() {
@@ -939,7 +992,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         l.setEnabled(false);
     }
 
-    private void loadBarChartData() {
+    private void loadBarChartData(Footprint footprint) {
         ArrayList<String> labels = new ArrayList<>();
         ArrayList<BarEntry> entries = new ArrayList<>();
         ArrayList<Integer> colors = new ArrayList<>();
@@ -949,6 +1002,9 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
             entries.add(new BarEntry(0, (float) totalCO2));
             colors.add(Color.rgb(26, 201, 53));
             barChartTitle.setText("You vs Rest of World");
+            barchartParagraph.setText(getBarChartParagraph(footprint));
+        }else{
+            barChartTitle.setText("Ireland vs Rest of World");
         }
 
         labels.add("Ireland");
@@ -983,6 +1039,20 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
         barChart.setData(data);
         barChart.invalidate();
+    }
+
+    private String getBarChartParagraph(Footprint footprint) {
+        String s="";
+        double total = footprint.getClothing()+footprint.getFlight()+footprint.getFood();
+        if(total>13){
+            s="Your footprint is bigger than most Irish people and we're not doing well to begin with!\nYou could really benefit from some of the recommendations listed below, take a look now to start your journey toward a 5 tonne lifestyle.";
+        }else if(total<5.5) {
+            s="Your footprint is well below the average Irish person, well done!\nHowever you can still improve it, take a look at some of our recommendations below";
+        } else{
+            s="Your footprint could use some work!\n take a look at some of our recommendations below to start your journey toward a 5 tonne lifestyle.";
+            }
+
+        return s;
     }
 
     public void setUpPieChart(Footprint footprint) {
@@ -1035,23 +1105,19 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
                 //flight clicked
                 recLayout.setVisibility(View.VISIBLE);
                 recTitle.setText("Flights");
-                recParagraph.setText(flightRecContent);
-                Log.i("I clicked on flight", String.valueOf(h.getX()));
+                recParagraph.setText(flightContent);
                 break;
             case "1.0":
                 //food clicked
                 recLayout.setVisibility(View.VISIBLE);
                 recTitle.setText("Food");
-                recParagraph.setText(foodRecContent);
-               // foodPieChartLayout.setVisibility(View.VISIBLE);
-                Log.i("I clicked on food", String.valueOf(h.getX()));
+                recParagraph.setText(foodContent);
                 break;
             case "2.0":
                 //clothing clicked
                 recLayout.setVisibility(View.VISIBLE);
                 recTitle.setText("Clothing");
-                recParagraph.setText(clothingRecContent);
-                Log.i("I clicked on clothing", String.valueOf(h.getX()));
+                recParagraph.setText(clothingContent);
                 break;
 
         }
@@ -1062,11 +1128,7 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     @Override
     public void onNothingSelected() {
         recLayout.setVisibility(View.GONE);
-        if(foodPieChartLayout.getVisibility() == View.VISIBLE){
-            foodPieChartLayout.setVisibility(View.GONE);
-        }
         Log.i("nothing selected", "a");
-        //set information invisible
 
     }
 
@@ -1074,9 +1136,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
         return f.getAmbition().equalsIgnoreCase("High");
     }
 
-    public double convertPoundToTon(double pound) {
-        return (double) (pound * 0.000453592);
-    }
 
     public double round(double number) {
         number = Math.round(number * 100);
@@ -1090,7 +1149,6 @@ public class HomeFragment extends Fragment implements OnChartValueSelectedListen
     }
 
     public boolean biggestOfFive(double max, double val1, double val2, double val3, double val4) {
-        //Log.i("12345", String.valueOf(max)+"|"+String.valueOf(val1)+"|"+String.valueOf(val2)+"|"+String.valueOf(val3)+"|"+String.valueOf(val4));
         return max > val1 && max > val2 && max > val3 && max > val4;
     }
 

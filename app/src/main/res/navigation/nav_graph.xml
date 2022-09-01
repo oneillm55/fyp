@@ -27,9 +27,4 @@
         android:name="com.example.fyp.FoodFolder.FoodFragment"
         android:label="FoodFragment"
         tools:layout="@layout/fragment_food"/>
-    <fragment
-        android:id="@+id/viewFlightsFragment"
-        android:name="com.example.fyp.FlightFolder.ViewFlightsFragment"
-        android:label="ViewFlightsFragment"
-        tools:layout="@layout/fragment_view_flights"/>
 </navigation>

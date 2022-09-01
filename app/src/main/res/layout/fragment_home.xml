@@ -10,16 +10,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp">
 
         <TextView
             android:id="@+id/totalCO2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="0.0 Total CO2"
+            android:textAlignment="center"
+            android:text=""
             android:textSize="30dp"
             android:visibility="gone"/>
+
 
         <LinearLayout
             android:id="@+id/big3Layout"
@@ -27,44 +31,50 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
+            android:textAlignment="center"
             android:visibility="gone">
-
             <TextView
-                android:id="@+id/rec1Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rec1"
-                android:textSize="30dp" />
+                android:layout_gravity="center_horizontal"
+                android:textAlignment="center"
+                android:text="Welcome to \nThe Big 3!"
+                android:textSize="30dp"/>
 
             <TextView
                 android:id="@+id/rec1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rec//////////////////"
-                android:textSize="20dp" />
+                android:text="\n  We're here to help you better understand your carbon footprint and guide you towards improving it for yourself and the planet!\n\n  The app allows you to calculate your footprint based on your Food, Flights and Clothing consumption (aka The Big 3!) and gives you personalised recommendations based on how ambitious you are about improving them."
+                android:textSize="20dp"
+               />
             <TextView
+                android:paddingTop="20dp"
                 android:id="@+id/rec2Title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Rec2"
+                android:textAlignment="center"
+                android:text="Getting started:"
                 android:textSize="30dp" />
             <TextView
                 android:id="@+id/rec2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rec2////////////////////////////////////"
+                android:text="  Your Clothing, Food and Flight data can be inut via the the drawer on the left!\n\n Check back here after each step to see your personalised report on where your carbon footprint is coming from and how can help reduce it! \n\n   NOTE: All of these recommendations are based on how ambitious you are about improving your CO2 output, you can adjust this in the Ambition section of the app. "
                 android:textSize="20dp" />
             <TextView
                 android:id="@+id/rec3Title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Rec3"
+                android:textAlignment="center"
+                android:text="\nFor Now"
                 android:textSize="30dp" />
             <TextView
+                android:textAlignment="center"
                 android:id="@+id/rec3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rec3////////////////////////////////////"
+                android:text="  Some basic info to help you start to understand your Big 3 impact"
                 android:textSize="20dp" />
 
         </LinearLayout>
@@ -80,13 +90,13 @@
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/pieChart"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
+                android:layout_height="400dp"></com.github.mikephil.charting.charts.PieChart>
             <TextView
                 android:id="@+id/clickPCTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp"
                 android:layout_gravity="center"
-                android:text="Click on the pie chart sections to view your recommendations"
+                android:text="Click on the individual sections for more information"
                 android:textSize="12dp"
                 android:textStyle="italic" />
 
@@ -149,110 +159,34 @@
             </LinearLayout>
             <TextView
                 style="@style/border1"/>
-        </LinearLayout>
-    <LinearLayout
-        android:id="@+id/recommendationLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/grey_1"
-        android:visibility="gone"
-        >
-
-        <TextView
-            android:id="@+id/recommendationTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:text="Rec Title"
-            android:textSize="30dp" />
-        <TextView
-            style="@style/border2"/>
-        <TextView
-            android:id="@+id/recommendationParagraph"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:text="Rec Paragraphh
+            <LinearLayout
+                android:id="@+id/recLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical"
+                android:background="@drawable/light_background"
+                android:visibility="gone">
+                <TextView
+                    android:id="@+id/recommendationTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text=""
+                    android:textSize="30dp" />
+                <TextView
+                    style="@style/border1"/>
+                <TextView
+                    android:id="@+id/recommendationParagraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="Rec Paragraphh
 //////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////
-"
-            android:textSize="18dp" />
-        <TextView
-            style="@style/border1"/>
-
-    </LinearLayout>
-        <LinearLayout
-            android:id="@+id/flightPieChartLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:visibility="gone">
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/flightPieChart"
-                android:layout_width="250dp"
-                android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
-            <TextView
-                android:id="@+id/flightPieChartLabel"
-                android:layout_width="150dp"
-                android:layout_height="300dp"
-                android:textAlignment="center"
-                android:text="The impact of your flights broken down"
-                android:textSize="25dp"/>
-
-
-            <TextView
-                style="@style/border1"/>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/foodPieChartLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:visibility="gone">
-            <TextView
-                android:id="@+id/foodPieChartLabel"
-                android:layout_width="150dp"
-                android:layout_height="300dp"
-                android:textAlignment="center"
-                android:text="The impact of your food consumption broken down"
-                android:textSize="25dp"/>
-
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/foodPieChart"
-                android:layout_width="250dp"
-                android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
-
-
-            <TextView
-                style="@style/border1"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/clothingPieChartLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:visibility="gone">
-            <com.github.mikephil.charting.charts.PieChart
-                android:id="@+id/clothingPieChart"
-                android:layout_width="250dp"
-                android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
-            <TextView
-                android:id="@+id/clothingPieChartLabel"
-                android:layout_width="150dp"
-                android:layout_height="300dp"
-                android:textAlignment="center"
-                android:text="The impact of your clothing consumption broken down"
-                android:textSize="25dp"/>
-
-
-            <TextView
-                style="@style/border1"/>
+////////////////////////////////////////////////////////"
+                    android:textSize="18dp" />
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -263,6 +197,8 @@
             android:orientation="vertical"
             android:visibility="gone"
             >
+            <TextView
+                style="@style/border1"/>
             <TextView
                 android:id="@+id/barChartTitle"
                 android:layout_width="wrap_content"
@@ -277,14 +213,128 @@
                 android:layout_width="match_parent"
                 android:layout_height="300dp"></com.github.mikephil.charting.charts.BarChart>
 
+            <TextView
+                android:id="@+id/barChartParagraph"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Ireland are the 3rd worst performing member of the EU in Carbon footprint per person\n The recommendation from the experts is the try and get out footprint to 5t\n Start inputting your data now and comeback to see how you fair against this graph"
+                android:textSize="15dp" />
+            <TextView
+                style="@style/border1"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/flightPieChartLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/flightPieChart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
+
 
             <TextView
-                android:id="@+id/elephant_value"
-                android:layout_width="wrap_content"
+                style="@style/border1"/>
+            <TextView
+                android:id="@+id/flightRecommendationTitle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="1.5 Elephants" />
+                android:layout_gravity="left"
+                android:text="Flight Recommendations:"
+                android:textSize="30dp" />
+            <TextView
+                style="@style/border1"/>
+            <TextView
+                android:id="@+id/flightRecommendationParagraph"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="Rec Paragraphh
+//////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////"
+                android:textSize="18dp" />
         </LinearLayout>
+        <LinearLayout
+            android:id="@+id/foodPieChartLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/foodPieChart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
+
+
+            <TextView
+                style="@style/border1"/>
+            <TextView
+                android:id="@+id/foodRecommendationTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="Food Recommendations:"
+                android:textSize="30dp" />
+            <TextView
+                style="@style/border1"/>
+            <TextView
+                android:id="@+id/foodRecommendationParagraph"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="Rec Paragraphh
+//////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////"
+                android:textSize="18dp" />
+        </LinearLayout>
+    <LinearLayout
+        android:id="@+id/clothingPieChartLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/clothingPieChart"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"></com.github.mikephil.charting.charts.PieChart>
+
+
+            <TextView
+                style="@style/border1"/>
+
+            <TextView
+                android:id="@+id/clothingRecommendationTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="Clothing Recommendations:"
+                android:textSize="30dp" />
+            <TextView
+                style="@style/border1"/>
+            <TextView
+                android:id="@+id/clothingRecommendationParagraph"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="Rec Paragraphh
+//////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////"
+                android:textSize="18dp" />
+    </LinearLayout>
+
+
     </LinearLayout>
 
 </ScrollView>

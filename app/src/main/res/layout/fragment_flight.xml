@@ -156,22 +156,31 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center">
-            <Button
-                android:id="@+id/cancelFlightButton"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="180dp"
-                android:layout_height="62dp"
-                android:text="Cancel"/>
+
             <Button
                 android:id="@+id/saveFlightButton"
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="180dp"
                 android:layout_height="62dp"
                 android:text="Save Flight"/>
-
+            <Button
+                android:id="@+id/cancelFlightButton"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="180dp"
+                android:layout_height="62dp"
+                android:text="Cancel"/>
 
         </LinearLayout>
     </LinearLayout>
+        <TextView
+            android:id="@+id/logFlights"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:textStyle="italic"
+            android:text="Log all your flights form the past year here"/>
+        <TextView
+            style="@style/border2"/>
 
         <Button
             android:id="@+id/openAddFlightButton"

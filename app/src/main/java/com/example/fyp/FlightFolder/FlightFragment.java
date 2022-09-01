@@ -58,7 +58,7 @@ import java.util.UUID;
 
 public class FlightFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
-    private TextView flightFootprint;
+    private TextView flightFootprint, logFlightsTextView;
     private EditText depart, arrival;
     private Button cancelFlightButton, addFlightButton, saveFlightButton;
     private FirebaseAuth firebaseAuth;
@@ -112,7 +112,6 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
             }
         });
-       // return inflater.inflate(R.layout.fragment_flight, container, false);
         return view;
 
     }
@@ -133,15 +132,15 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         firebaseUser = firebaseAuth.getCurrentUser();
         userID = firebaseUser.getUid();
         mDatabase = FirebaseDatabase.getInstance().getReference();
-      //  calculationValid = false;
         airports = getResources().getStringArray(R.array.airports);
         addFlightLayout= view.findViewById(R.id.addFlightLayout);
         recyclerLayout= view.findViewById(R.id.recyclerLayout);
         totalLayout= view.findViewById(R.id.totalFlightLayout);
         locationMap = latLngMap.getLocationMap();
+        logFlightsTextView= view.findViewById(R.id.logFlights);
 
 
-        userHasFlights();//check if the user has any flights saved before setting the recyclerview visible
+        userHasFlights();//checks if the user has any flights saved before setting the recyclerview visible
 
         setTotalFootprint();
 
@@ -210,6 +209,7 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
             public void onClick(View view) {
               addFlightLayout.setVisibility(View.VISIBLE);
               addFlightButton.setVisibility(View.GONE);
+              logFlightsTextView.setVisibility(View.GONE);
             }
         });
 
@@ -269,7 +269,6 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
 
                             @Override
                             public void run() {
-                                //move run on ui thread here on a condition
                                 if(valid){
                                     Toast.makeText(getContext(), "Flight Saved", Toast.LENGTH_SHORT).show();
                                     addFlightLayout.setVisibility(View.GONE);
@@ -307,6 +306,8 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
         departLocation = (Location) locationMap.get(departIATA);
 
        double distanceKM= (departLocation.distanceTo(arriveLocation))/1000;
+        Log.e("distance : ", String.valueOf(distanceKM));
+
        if(distanceKM<=1500){
            haul = "Short";
        }else if(distanceKM>=4100){
@@ -323,9 +324,8 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    //check theres a flight in the database
+                    //checks theres a flight in the database
                     if(snapshot.hasChildren()){
-                      //  if so set recyclerview to be visible
                         recyclerLayout.setVisibility(View.VISIBLE);
 
 
@@ -361,7 +361,6 @@ public class FlightFragment extends Fragment implements AdapterView.OnItemSelect
                 if (snapshot.exists()) {
                     Footprint footprint = snapshot.getValue(Footprint.class);
                     newFlightFootprint = footprint.getFlight() + d;
-                   // mDatabase.child("footprint").child(firebaseAuth.getUid()).child("flight").setValue(round(newFlightFootprint,2));
                     mDatabase.child(firebaseAuth.getUid()).child("footprint").child("flight").setValue(newFlightFootprint);
                     totalLayout.setVisibility(View.VISIBLE);
                     flightFootprint.setText(String.valueOf(round(newFlightFootprint,2) ) + " tonnes of CO2");

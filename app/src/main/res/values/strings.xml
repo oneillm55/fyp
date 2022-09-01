@@ -39,7 +39,7 @@
 
     <string-array name="airports">
         <item>Athens International(ATH)</item>
-        <item>Barcelona(BCR)</item>
+        <item>Barcelona(BCN)</item>
         <item>Dublin(DUB)</item>
         <item>Hong Kong International(HKG)</item>
         <item>London Heathrow(LHR)</item>
